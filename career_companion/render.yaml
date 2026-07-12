@@ -1,0 +1,19 @@
+﻿services:
+  - type: web
+    name: agentic-career-companion
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT
+    envVars:
+      - key: WX_API_KEY
+        sync: false
+      - key: WX_PROJECT_ID
+        sync: false
+      - key: WX_URL
+        value: https://us-south.ml.cloud.ibm.com
+      - key: FLASK_SECRET_KEY
+        generateValue: true
+      - key: FLASK_ENV
+        value: production
+      - key: PYTHON_VERSION
+        value: 3.11.0
