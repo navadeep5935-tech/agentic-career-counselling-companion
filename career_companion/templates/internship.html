@@ -1,0 +1,223 @@
+{% extends "base.html" %}
+{% block title %}Internship Center — Career Companion{% endblock %}
+{% block topbar_title %}Internship & Opportunity Center{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div class="breadcrumb"><a href="/">Home</a><span>/</span>Internship Center</div>
+  <h1>🏢 Internship &amp; Opportunity Center</h1>
+  <p>Everything you need to find, prepare for, and secure your first internship or job</p>
+</div>
+
+<div class="tab-nav">
+  <button class="tab-btn active" data-tab="prep">🎯 Preparation</button>
+  <button class="tab-btn" data-tab="apply">📋 Application</button>
+  <button class="tab-btn" data-tab="interview">🎤 Interviews</button>
+  <button class="tab-btn" data-tab="resume">📄 Resume</button>
+  <button class="tab-btn" data-tab="resources">📚 Resources</button>
+</div>
+
+<div data-tab-group>
+
+  <!-- Preparation -->
+  <div id="prep" class="tab-pane active">
+    <div class="grid grid-2">
+      <div class="card">
+        <div class="card-header"><h3>🎯 Internship Preparation Checklist</h3></div>
+        <div class="timeline">
+          {% set prep_items = [
+            ("Build Core Skills","Learn the technical skills required for your target role — Python, SQL, JavaScript, etc."),
+            ("Complete 2–3 Projects","Build portfolio projects that demonstrate hands-on ability, not just theory."),
+            ("Create GitHub Profile","Push all projects to GitHub with proper READMEs and documentation."),
+            ("Update LinkedIn Profile","Professional photo, headline, summary, skills, and certifications."),
+            ("Craft a Targeted Resume","Single-page resume tailored to your target role and company."),
+            ("Practice Coding Problems","Solve 50+ problems on LeetCode/HackerRank focusing on Data Structures."),
+            ("Research Target Companies","Identify 10–20 companies aligned with your skills and interests."),
+            ("Get Referrals","Connect with seniors, alumni, and professionals working at target companies."),
+          ] %}
+          {% for title, body in prep_items %}
+          <div class="timeline-item">
+            <div class="timeline-dot {% if loop.index % 3 == 0 %}purple{% elif loop.index % 3 == 2 %}teal{% endif %}"></div>
+            <div class="timeline-title">{{ title }}</div>
+            <div class="timeline-body">{{ body }}</div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      <div>
+        <div class="card mb-4">
+          <div class="card-header"><h3>⏰ Timeline to Internship</h3></div>
+          <div class="timeline">
+            <div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-title">Month 1–2</div><div class="timeline-body">Build skills, complete beginner projects, create profiles.</div></div>
+            <div class="timeline-item"><div class="timeline-dot teal"></div><div class="timeline-title">Month 3–4</div><div class="timeline-body">Intermediate projects, resume drafting, LinkedIn optimization.</div></div>
+            <div class="timeline-item"><div class="timeline-dot purple"></div><div class="timeline-title">Month 5–6</div><div class="timeline-body">Networking, applying to 50+ companies, interview preparation.</div></div>
+            <div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-title">Month 6+</div><div class="timeline-body">Offers, negotiation, onboarding — start your career!</div></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>🎯 Target Industries</h3></div>
+          <div class="tag-list">
+            {% for ind in ['FAANG / Top Tech', 'Startups', 'IBM / Cognizant / TCS', 'Fintech', 'Healthcare Tech', 'Government Tech', 'Remote First Companies', 'AI/ML Labs', 'Open Source Orgs'] %}
+            <span class="badge badge-blue">{{ ind }}</span>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Application -->
+  <div id="apply" class="tab-pane">
+    <div class="grid grid-2">
+      <div class="card">
+        <div class="card-header"><h3>📋 Application Strategy</h3></div>
+        {% set strategies = [
+          ("Apply Volume + Quality","Apply to 50–100 companies. Tailor your top 20 applications with personalized cover letters."),
+          ("Use Multiple Channels","LinkedIn Easy Apply, company careers pages, Indeed, Internshala, AngelList, and referrals."),
+          ("Target Off-Season","Apply in Jan–Feb and Aug–Sep when fewer candidates are competing."),
+          ("Cold Email Hiring Managers","Send personalized emails directly to team leads and engineering managers."),
+          ("Leverage Alumni Network","Use LinkedIn to find alumni from your college working at target companies."),
+          ("Follow Up","Send a polite follow-up email 5–7 days after applying if you haven't heard back."),
+          ("Track Applications","Maintain a spreadsheet of companies, dates applied, and status."),
+          ("Optimize for ATS","Use keywords from job descriptions in your resume for ATS compatibility."),
+        ] %}
+        {% for title, desc in strategies %}
+        <div style="display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--border-color);font-size:13.5px;">
+          <span style="color:var(--accent-blue);font-weight:700;flex-shrink:0;">→</span>
+          <div><strong>{{ title }}:</strong> <span style="color:var(--text-secondary);">{{ desc }}</span></div>
+        </div>
+        {% endfor %}
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>🔍 Where to Find Internships</h3></div>
+        {% set platforms = [
+          ('LinkedIn Jobs', '🔵', 'The #1 platform for professional internships globally.'),
+          ('Internshala', '🟢', 'Best for Indian students — thousands of internship listings.'),
+          ('AngelList / Wellfound', '🟣', 'Startup internships and early-stage company roles.'),
+          ('GitHub Jobs', '⚫', 'Developer-specific roles posted by open-source companies.'),
+          ('Company Career Pages', '🔴', 'Apply directly at IBM, Google, Microsoft, TCS, Infosys.'),
+          ('HackerEarth / HackerRank', '🟠', 'Hiring challenges and hackathon-to-internship pipelines.'),
+          ('Campus Placements', '🟡', "Leverage your college's TPO and alumni connections."),
+          ('LinkedIn Network', '🔵', 'DM professionals, ask for referrals, join relevant groups.'),
+        ] %}
+        {% for platform, icon, desc in platforms %}
+        <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border-color);">
+          <span style="font-size:18px;flex-shrink:0;">{{ icon }}</span>
+          <div style="font-size:13.5px;"><strong>{{ platform }}:</strong> <span style="color:var(--text-secondary);">{{ desc }}</span></div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Interview -->
+  <div id="interview" class="tab-pane">
+    <div class="grid grid-2">
+      <div class="card">
+        <div class="card-header"><h3>🎤 Technical Interview Prep</h3></div>
+        <div class="timeline">
+          <div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-title">Data Structures &amp; Algorithms</div><div class="timeline-body">Arrays, Strings, Trees, Graphs, DP — 50+ problems minimum on LeetCode.</div></div>
+          <div class="timeline-item"><div class="timeline-dot teal"></div><div class="timeline-title">System Design</div><div class="timeline-body">Design URL shortener, Twitter feed, ride-sharing system. Know CAP theorem.</div></div>
+          <div class="timeline-item"><div class="timeline-dot purple"></div><div class="timeline-title">OOP &amp; Design Patterns</div><div class="timeline-body">SOLID principles, Singleton, Factory, Observer. Code cleanly.</div></div>
+          <div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-title">Database / SQL</div><div class="timeline-body">Joins, indexing, normalization, transactions, query optimization.</div></div>
+          <div class="timeline-item"><div class="timeline-dot teal"></div><div class="timeline-title">Project Deep Dives</div><div class="timeline-body">Know every detail of your own projects — architecture, decisions, tradeoffs.</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>🗣️ Behavioral Interview Tips</h3></div>
+        <div style="margin-bottom:16px;">
+          <div style="font-weight:600;font-size:14px;margin-bottom:8px;">STAR Framework</div>
+          <div class="grid grid-2" style="gap:10px;font-size:13px;">
+            <div style="background:var(--bg-secondary);padding:10px;border-radius:6px;"><strong style="color:var(--accent-blue);">S</strong>ituation — Set the scene</div>
+            <div style="background:var(--bg-secondary);padding:10px;border-radius:6px;"><strong style="color:var(--accent-teal);">T</strong>ask — Describe the challenge</div>
+            <div style="background:var(--bg-secondary);padding:10px;border-radius:6px;"><strong style="color:var(--accent-purple);">A</strong>ction — What you did</div>
+            <div style="background:var(--bg-secondary);padding:10px;border-radius:6px;"><strong style="color:var(--accent-green);">R</strong>esult — Measurable outcome</div>
+          </div>
+        </div>
+        <hr class="divider" />
+        <div style="font-weight:600;font-size:14px;margin-bottom:8px;">Common Questions</div>
+        {% for q in ["Tell me about yourself.", "Why do you want this internship?", "Describe a challenge you overcame.", "What's your greatest strength/weakness?", "Tell me about a project you're proud of.", "Where do you see yourself in 5 years?"] %}
+        <div style="padding:8px 0;border-bottom:1px solid var(--border-color);font-size:13.5px;">❓ {{ q }}</div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Resume -->
+  <div id="resume" class="tab-pane">
+    <div class="grid grid-2">
+      <div class="card">
+        <div class="card-header"><h3>📄 Resume Building Guide</h3></div>
+        {% set resume_tips = [
+          ("One Page Rule","Keep your resume to exactly one page. No exceptions for freshers and juniors."),
+          ("ATS Optimization","Use keywords from job descriptions. Avoid tables, graphics, and headers/footers."),
+          ("Quantify Everything","Bad: 'Worked on website'. Good: 'Built React app used by 500+ students'."),
+          ("Strong Action Verbs","Start each bullet with: Built, Designed, Optimized, Led, Deployed, Reduced."),
+          ("Reverse Chronological","Most recent experience and education first. Projects before experience."),
+          ("Skills Section","List technical skills grouped: Languages, Frameworks, Tools, Databases, Cloud."),
+          ("Custom per Application","Tailor your resume to match each job description — don't use one generic version."),
+          ("Proofread Rigorously","Zero spelling/grammar errors. Have 3 people review it before sending."),
+        ] %}
+        {% for title, desc in resume_tips %}
+        <div style="display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--border-color);font-size:13.5px;">
+          <span style="color:var(--accent-green);font-weight:700;flex-shrink:0;">✓</span>
+          <div><strong>{{ title }}:</strong> <span style="color:var(--text-secondary);">{{ desc }}</span></div>
+        </div>
+        {% endfor %}
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>📐 Resume Structure</h3></div>
+        {% set sections = [
+          ("Header","Name (large), Phone, Email, LinkedIn URL, GitHub URL, City"),
+          ("Summary (optional)","2–3 sentence career objective tailored to the role"),
+          ("Education","Degree, Branch, CGPA, Year, College Name"),
+          ("Technical Skills","Languages, Frameworks, Tools, Cloud, Databases"),
+          ("Projects (most important)","3–4 projects with tech stack, your role, and impact"),
+          ("Experience / Internships","Any relevant work experience, even part-time or freelance"),
+          ("Certifications","IBM, AWS, Google certifications with completion dates"),
+          ("Achievements","Hackathon wins, competitive programming, open source"),
+        ] %}
+        {% for section, content in sections %}
+        <div style="display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--border-color);font-size:13.5px;">
+          <span class="badge badge-blue" style="flex-shrink:0;align-self:flex-start;">{{ loop.index }}</span>
+          <div><strong>{{ section }}: </strong><span style="color:var(--text-secondary);">{{ content }}</span></div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Resources -->
+  <div id="resources" class="tab-pane">
+    <div class="grid grid-3">
+      {% set resources = [
+        ("💻","LeetCode","https://leetcode.com","Practice 500+ coding problems. Focus on Easy/Medium for internships.","Coding Practice"),
+        ("📚","GeeksforGeeks","https://geeksforgeeks.org","Best resource for DSA, system design, and CS fundamentals.","Learning"),
+        ("🎓","Coursera","https://coursera.org","University-grade courses and professional certificates.","Courses"),
+        ("📹","YouTube: NeetCode","https://youtube.com","Best DSA problem walkthroughs and patterns.","Coding Practice"),
+        ("🔗","LinkedIn Learning","https://linkedin.com/learning","Soft skills, technical skills, and industry courses.","Professional Dev"),
+        ("📖","Cracking the Coding Interview","#","The classic interview prep book for technical roles.","Books"),
+        ("🌐","GitHub","https://github.com","Build your open source portfolio and contribute to projects.","Portfolio"),
+        ("📊","Kaggle","https://kaggle.com","Data science competitions and datasets for portfolio projects.","Data Science"),
+        ("🔒","TryHackMe","https://tryhackme.com","Cybersecurity learning through hands-on labs and challenges.","Cybersecurity"),
+      ] %}
+      {% for icon, name, url, desc, category in resources %}
+      <div class="card">
+        <div style="font-size:28px;margin-bottom:10px;">{{ icon }}</div>
+        <div style="font-weight:600;font-size:14px;margin-bottom:4px;">{{ name }}</div>
+        <span class="badge badge-gray" style="margin-bottom:10px;">{{ category }}</span>
+        <p style="font-size:13px;color:var(--text-secondary);margin-bottom:14px;">{{ desc }}</p>
+        <a href="{{ url }}" class="btn btn-sm btn-outline" target="_blank">Visit Resource →</a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+</div>
+
+<div class="alert alert-info mt-8">
+  <span>🤖</span>
+  <div><strong>Get personalized internship advice.</strong> Ask the <a href="{{ url_for('mentor') }}">AI Career Mentor</a>: <em>"How should I prepare for internships at tech companies in {{ profile.preferred_location or 'Bangalore' }}?"</em></div>
+</div>
+
+{% endblock %}

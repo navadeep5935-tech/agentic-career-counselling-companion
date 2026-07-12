@@ -1,0 +1,235 @@
+{% extends "base.html" %}
+{% block title %}Skill Gap Analysis — Career Companion{% endblock %}
+{% block topbar_title %}Skill Gap Analysis{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div class="breadcrumb"><a href="/">Home</a><span>/</span>Skill Gap Analysis</div>
+  <h1>🎯 Skill Gap Analysis</h1>
+  <p>Understand where you stand vs. industry requirements and get a recommended learning path</p>
+</div>
+
+<!-- Overview Cards -->
+<div class="grid grid-4" style="margin-bottom:24px;">
+  <div class="score-card green">
+    <div class="score-icon green">✅</div>
+    <div class="card-title">Skills Acquired</div>
+    <div class="card-value">{{ gap_data.existing | length }}</div>
+    <div class="card-subtitle">of {{ gap_data.required | length }} required</div>
+  </div>
+  <div class="score-card orange">
+    <div class="score-icon orange">⚠️</div>
+    <div class="card-title">Skills Missing</div>
+    <div class="card-value">{{ gap_data.missing | length }}</div>
+    <div class="card-subtitle">Priority to learn</div>
+  </div>
+  <div class="score-card blue">
+    <div class="score-icon blue">📋</div>
+    <div class="card-title">Total Skills</div>
+    <div class="card-value">{{ profile.skills | length }}</div>
+    <div class="card-subtitle">In your profile</div>
+  </div>
+  <div class="score-card purple">
+    <div class="score-icon purple">🎯</div>
+    <div class="card-title">Coverage</div>
+    <div class="card-value">{{ ((gap_data.existing | length) / (gap_data.required | length) * 100) | round | int }}%</div>
+    <div class="card-subtitle">of {{ profile.preferred_industry or 'Tech' }} requirements</div>
+  </div>
+</div>
+
+<div class="grid grid-2" style="margin-bottom:24px;">
+  <!-- Doughnut Chart -->
+  <div class="card">
+    <div class="card-header"><h3>📊 Skills Coverage Overview</h3></div>
+    <div style="max-width:280px;margin:0 auto;">
+      <canvas id="skillGapChart"
+        data-existing="{{ gap_data.existing | length }}"
+        data-missing="{{ gap_data.missing | length }}"></canvas>
+    </div>
+    <div style="text-align:center;margin-top:12px;font-size:13px;color:var(--text-secondary);">
+      Industry: <strong>{{ profile.preferred_industry or 'Technology' }}</strong>
+    </div>
+  </div>
+
+  <!-- Skills Breakdown -->
+  <div class="card">
+    <div class="card-header"><h3>🔍 Required Skills Breakdown</h3></div>
+    {% for skill in gap_data.required %}
+    {% set acquired = skill in gap_data.existing %}
+    <div class="progress-bar-container">
+      <div class="progress-label">
+        <span style="display:flex;align-items:center;gap:6px;">
+          <span>{{ '✅' if acquired else '❌' }}</span>{{ skill }}
+        </span>
+        <span class="badge {{ 'badge-green' if acquired else 'badge-red' }}">{{ 'Acquired' if acquired else 'Missing' }}</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill {{ 'green' if acquired else 'red' }}" data-value="{{ 80 if acquired else 20 }}" style="width:0%"></div></div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- Skills Detail Panels -->
+<div class="grid grid-3" style="margin-bottom:24px;">
+  <!-- Current Skills -->
+  <div class="card">
+    <div class="card-header">
+      <h3>💪 Current Skills</h3>
+      <span class="badge badge-green">{{ profile.skills | length }}</span>
+    </div>
+    {% if profile.skills %}
+    <div class="tag-list">
+      {% for skill in profile.skills %}<span class="tag has-skill">{{ skill }}</span>{% endfor %}
+    </div>
+    {% else %}
+    <p style="color:var(--text-muted);font-size:13px;">No skills added yet. <a href="{{ url_for('profile') }}">Update your profile</a>.</p>
+    {% endif %}
+    <hr class="divider" />
+    <a href="{{ url_for('profile') }}" class="btn btn-sm btn-secondary">Add More Skills</a>
+  </div>
+
+  <!-- Required Skills -->
+  <div class="card">
+    <div class="card-header">
+      <h3>📋 Industry Required</h3>
+      <span class="badge badge-blue">{{ gap_data.required | length }}</span>
+    </div>
+    <div class="tag-list">
+      {% for skill in gap_data.required %}
+        <span class="tag {% if skill in gap_data.existing %}has-skill{% else %}missing{% endif %}">{{ skill }}</span>
+      {% endfor %}
+    </div>
+    <hr class="divider" />
+    <span style="font-size:12px;color:var(--text-muted);">For: {{ profile.preferred_industry or 'Technology' }}</span>
+  </div>
+
+  <!-- Missing / Priority -->
+  <div class="card">
+    <div class="card-header">
+      <h3>🚨 Priority to Learn</h3>
+      <span class="badge badge-red">{{ gap_data.missing | length }}</span>
+    </div>
+    {% if gap_data.missing %}
+    <div class="tag-list">
+      {% for skill in gap_data.missing %}<span class="tag missing">{{ skill }}</span>{% endfor %}
+    </div>
+    <hr class="divider" />
+    <a href="{{ url_for('roadmap') }}" class="btn btn-sm btn-primary">View Learning Plan →</a>
+    {% else %}
+    <div class="alert alert-success">
+      <span>🎉</span><div>Excellent! You have all required skills for your target industry.</div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Recommended Learning Path -->
+<div class="card mb-8">
+  <div class="card-header">
+    <h3>🗺️ Recommended Learning Path</h3>
+    <a href="{{ url_for('roadmap') }}" class="btn btn-sm btn-outline">Full Roadmap →</a>
+  </div>
+  <div class="grid grid-3">
+    <div style="border-right:1px solid var(--border-color);padding-right:20px;">
+      <div class="roadmap-badge short" style="margin-bottom:12px;">Phase 1 · 0–3 Months</div>
+      <div class="timeline">
+        {% for skill in gap_data.missing[:3] %}
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-title" style="font-size:13px;">Learn {{ skill }}</div>
+          <div class="timeline-body">Free online resources + 1 small project</div>
+        </div>
+        {% endfor %}
+        {% if not gap_data.missing %}
+        <div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-title" style="font-size:13px;">Deepen existing skills</div></div>
+        {% endif %}
+      </div>
+    </div>
+    <div style="border-right:1px solid var(--border-color);padding:0 20px;">
+      <div class="roadmap-badge medium" style="margin-bottom:12px;">Phase 2 · 3–9 Months</div>
+      <div class="timeline">
+        {% for skill in gap_data.missing[3:6] %}
+        <div class="timeline-item">
+          <div class="timeline-dot teal"></div>
+          <div class="timeline-title" style="font-size:13px;">Master {{ skill }}</div>
+          <div class="timeline-body">Course + certification + portfolio project</div>
+        </div>
+        {% endfor %}
+        {% if gap_data.missing | length <= 3 %}
+        <div class="timeline-item"><div class="timeline-dot teal"></div><div class="timeline-title" style="font-size:13px;">Advanced projects</div><div class="timeline-body">Build production-level portfolio items</div></div>
+        {% endif %}
+      </div>
+    </div>
+    <div style="padding-left:20px;">
+      <div class="roadmap-badge long" style="margin-bottom:12px;">Phase 3 · 9+ Months</div>
+      <div class="timeline">
+        <div class="timeline-item"><div class="timeline-dot purple"></div><div class="timeline-title" style="font-size:13px;">System Design</div><div class="timeline-body">Architecture patterns &amp; scalable systems</div></div>
+        <div class="timeline-item"><div class="timeline-dot purple"></div><div class="timeline-title" style="font-size:13px;">Leadership Skills</div><div class="timeline-body">Tech lead, mentoring, communication</div></div>
+        <div class="timeline-item"><div class="timeline-dot purple"></div><div class="timeline-title" style="font-size:13px;">Open Source</div><div class="timeline-body">Contribute to major OSS projects</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- AI Skill Gap Banner -->
+{% if profile.profile_complete %}
+<div class="card mb-8" style="background:linear-gradient(135deg,rgba(15,98,254,0.06),rgba(124,58,237,0.06));border:1px solid rgba(15,98,254,0.2);">
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+    <div>
+      <div style="font-size:15px;font-weight:700;margin-bottom:4px;">✨ Run AI-Powered Skill Gap Analysis</div>
+      <div style="font-size:13px;color:var(--text-secondary);">IBM Granite will deeply analyse your profile and give a precise, personalised skill gap report.</div>
+    </div>
+    <button id="aiSkillBtn" onclick="runAISkillGap()"
+      class="btn btn-primary" style="white-space:nowrap;">✨ Analyse with IBM Granite</button>
+  </div>
+</div>
+<div id="aiSkillOutput" style="display:none;margin-bottom:24px;"></div>
+{% endif %}
+
+<!-- AI Mentor CTA -->
+<div class="alert alert-info">
+  <span>🤖</span>
+  <div>
+    <strong>Want a deeper skill gap analysis?</strong>
+    Ask the <a href="{{ url_for('mentor') }}">AI Career Mentor</a>: <em>"What specific resources should I use to learn {{ gap_data.missing[0] if gap_data.missing else 'System Design' }}?"</em>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+/* ── AI Skill Gap Analysis using IBM Granite ── */
+function runAISkillGap() {
+  var btn = document.getElementById('aiSkillBtn');
+  var out = document.getElementById('aiSkillOutput');
+  btn.disabled = true;
+  btn.textContent = '⏳ Analysing with IBM Granite…';
+  out.style.display = 'block';
+  out.innerHTML = '<div style="color:var(--text-muted);font-size:13px;padding:16px;text-align:center;">' +
+    '<div style="width:28px;height:28px;border:3px solid #e0e0e0;border-top-color:#0f62fe;border-radius:50%;' +
+    'animation:wxo-spin 0.7s linear infinite;margin:0 auto 10px;"></div>' +
+    'IBM Granite is analysing your skill gaps…</div>' +
+    '<style>@keyframes wxo-spin{to{transform:rotate(360deg)}}</style>';
+  fetch('/api/skill-gap-ai', { method: 'POST',
+    headers: { 'Content-Type': 'application/json' }, body: '{}' })
+  .then(r => r.json()).then(d => {
+    if (d.ok) {
+      out.innerHTML = '<div class="card" style="padding:20px;margin-top:0;">' +
+        '<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">' +
+        '<span style="font-size:18px;">🤖</span>' +
+        '<strong style="font-size:14px;color:var(--accent-blue);">AI Skill Gap Analysis — IBM Granite</strong></div>' +
+        '<div style="font-size:13.5px;line-height:1.8;white-space:pre-wrap;color:var(--text-primary);">' +
+        d.result.replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</div></div>';
+    } else {
+      out.innerHTML = '<div class="alert alert-warning"><span>⚠️</span><div>' + d.result + '</div></div>';
+    }
+    btn.disabled = false;
+    btn.innerHTML = '✨ Re-analyse with IBM Granite';
+  }).catch(() => {
+    out.innerHTML = '<div class="alert alert-warning"><span>⚠️</span><div>Could not reach the server.</div></div>';
+    btn.disabled = false; btn.textContent = '✨ AI Skill Gap Analysis';
+  });
+}
+</script>
+{% endblock %}

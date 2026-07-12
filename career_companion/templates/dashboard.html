@@ -1,0 +1,234 @@
+{% extends "base.html" %}
+{% block title %}Career Dashboard — Career Companion{% endblock %}
+{% block topbar_title %}Career Dashboard{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div class="breadcrumb"><a href="/">Home</a><span>/</span>Dashboard</div>
+  <h1>
+    {% if profile.full_name %}Welcome back, {{ profile.full_name.split()[0] }}!{% else %}Career Intelligence Dashboard{% endif %}
+  </h1>
+  <p>Your personalized career analytics and development insights</p>
+</div>
+
+{% if not profile.profile_complete %}
+<div class="alert alert-warning">
+  <span>⚠️</span>
+  <div>Your profile is incomplete. <a href="{{ url_for('profile') }}">Complete your profile</a> to see fully personalized scores and recommendations.</div>
+</div>
+{% endif %}
+
+<!-- Score Cards Row -->
+<div class="grid grid-4" style="margin-bottom:24px;">
+  <div class="score-card blue">
+    <div class="score-icon blue">🎯</div>
+    <div class="card-title">Career Readiness</div>
+    <div class="card-value"><span data-counter="{{ scores.career_readiness }}">{{ scores.career_readiness }}</span>%</div>
+    <div class="progress-bar" style="margin-top:10px;"><div class="progress-fill blue" data-value="{{ scores.career_readiness }}" style="width:0%"></div></div>
+    <div class="card-subtitle">
+      {% if scores.career_readiness >= 70 %}Good — Keep building{% elif scores.career_readiness >= 40 %}Developing{% else %}Just starting{% endif %}
+    </div>
+  </div>
+  <div class="score-card teal">
+    <div class="score-icon teal">💼</div>
+    <div class="card-title">Employability</div>
+    <div class="card-value"><span data-counter="{{ scores.employability }}">{{ scores.employability }}</span>%</div>
+    <div class="progress-bar" style="margin-top:10px;"><div class="progress-fill teal" data-value="{{ scores.employability }}" style="width:0%"></div></div>
+    <div class="card-subtitle">Based on skills &amp; CGPA</div>
+  </div>
+  <div class="score-card purple">
+    <div class="score-icon purple">💻</div>
+    <div class="card-title">Tech Readiness</div>
+    <div class="card-value"><span data-counter="{{ scores.tech_readiness }}">{{ scores.tech_readiness }}</span>%</div>
+    <div class="progress-bar" style="margin-top:10px;"><div class="progress-fill purple" data-value="{{ scores.tech_readiness }}" style="width:0%"></div></div>
+    <div class="card-subtitle">Technical skills coverage</div>
+  </div>
+  <div class="score-card green">
+    <div class="score-icon green">📈</div>
+    <div class="card-title">Learning Progress</div>
+    <div class="card-value"><span data-counter="{{ scores.learning_progress }}">{{ scores.learning_progress }}</span>%</div>
+    <div class="progress-bar" style="margin-top:10px;"><div class="progress-fill green" data-value="{{ scores.learning_progress }}" style="width:0%"></div></div>
+    <div class="card-subtitle">Profile &amp; skills completeness</div>
+  </div>
+</div>
+
+<!-- Charts Row -->
+<div class="grid grid-2" style="margin-bottom:24px;">
+  <div class="card">
+    <div class="card-header"><h3>🕸️ Skills Competency Radar</h3></div>
+    <div class="chart-canvas-wrap" style="max-height:280px;">
+      <canvas id="radarChart"></canvas>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header">
+      <h3>📈 Career Growth Timeline</h3>
+      <span class="badge badge-blue">Projected</span>
+    </div>
+    <div class="chart-canvas-wrap" style="max-height:280px;">
+      <canvas id="growthChart"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- Skills & Focus Row -->
+<div class="grid grid-2" style="margin-bottom:24px;">
+  <div class="card">
+    <div class="card-header">
+      <h3>🛠️ Skills Overview</h3>
+      <a href="{{ url_for('skill_gap') }}" class="btn btn-sm btn-outline">Full Analysis →</a>
+    </div>
+    {% if profile.skills %}
+      {% set skill_labels = profile.skills[:8] | tojson %}
+      {% set skill_values = [] %}
+      <canvas id="skillsChart" data-labels='{{ skill_labels }}' data-values='[{% for s in profile.skills[:8] %}{% if loop.index <= 3 %}{{ 70 + loop.index * 5 }}{% else %}{{ 55 + loop.index * 4 }}{% endif %}{% if not loop.last %},{% endif %}{% endfor %}]'></canvas>
+    {% else %}
+      <div class="text-center" style="padding:40px 0;color:var(--text-muted);">
+        <div style="font-size:40px;margin-bottom:8px;">🛠️</div>
+        <p>Add skills to your profile to see this chart.</p>
+        <a href="{{ url_for('profile') }}" class="btn btn-sm btn-primary mt-4">Update Profile</a>
+      </div>
+    {% endif %}
+  </div>
+  <div class="card">
+    <div class="card-header"><h3>🎯 Recommended Focus Areas</h3></div>
+    {% set focus_areas = [
+      ('System Design', 85, 'purple'),
+      ('Cloud Computing', 78, 'blue'),
+      ('Data Structures & Algorithms', 72, 'teal'),
+      ('Open Source Contributions', 65, 'green'),
+      ('Communication Skills', 60, 'orange'),
+    ] %}
+    {% for area, val, color in focus_areas %}
+    <div class="progress-bar-container">
+      <div class="progress-label"><span>{{ area }}</span><span>Priority: {{ val }}%</span></div>
+      <div class="progress-bar"><div class="progress-fill {{ color }}" data-value="{{ val }}" style="width:0%"></div></div>
+    </div>
+    {% endfor %}
+    <div class="mt-4">
+      <a href="{{ url_for('roadmap') }}" class="btn btn-sm btn-secondary">View Full Roadmap →</a>
+    </div>
+  </div>
+</div>
+
+<!-- Profile Summary & Quick Actions -->
+<div class="grid grid-2">
+  <div class="card">
+    <div class="card-header"><h3>👤 Profile Summary</h3></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;font-size:13.5px;">
+      <div><span class="text-muted">Education</span><br><strong>{{ profile.education or '—' }}</strong></div>
+      <div><span class="text-muted">Branch</span><br><strong>{{ profile.branch or '—' }}</strong></div>
+      <div><span class="text-muted">Year</span><br><strong>{{ profile.year_of_study or '—' }}</strong></div>
+      <div><span class="text-muted">CGPA</span><br><strong>{{ profile.cgpa or '—' }}</strong></div>
+      <div><span class="text-muted">Industry</span><br><strong>{{ profile.preferred_industry or '—' }}</strong></div>
+      <div><span class="text-muted">Location</span><br><strong>{{ profile.preferred_location or '—' }}</strong></div>
+    </div>
+    {% if profile.career_goals %}
+    <hr class="divider" />
+    <div class="text-muted" style="font-size:12px;margin-bottom:4px;">Career Goal</div>
+    <p style="font-size:13.5px;">{{ profile.career_goals }}</p>
+    {% endif %}
+    {% if profile.skills %}
+    <hr class="divider" />
+    <div class="text-muted" style="font-size:12px;margin-bottom:6px;">Skills ({{ profile.skills | length }})</div>
+    <div class="tag-list">
+      {% for skill in profile.skills[:10] %}<span class="tag has-skill">{{ skill }}</span>{% endfor %}
+      {% if profile.skills | length > 10 %}<span class="tag">+{{ profile.skills | length - 10 }} more</span>{% endif %}
+    </div>
+    {% endif %}
+    <hr class="divider" />
+    <a href="{{ url_for('profile') }}" class="btn btn-sm btn-secondary">Edit Profile</a>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><h3>⚡ Quick Actions</h3></div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <a href="{{ url_for('mentor') }}"        class="btn btn-primary"><span>🤖</span> Ask AI Career Mentor</a>
+      <a href="{{ url_for('skill_gap') }}"     class="btn btn-secondary"><span>🎯</span> Analyze Skill Gaps</a>
+      <a href="{{ url_for('roadmap') }}"       class="btn btn-secondary"><span>🗺️</span> View Learning Roadmap</a>
+      <a href="{{ url_for('projects') }}"      class="btn btn-secondary"><span>💡</span> Get Project Ideas</a>
+      <a href="{{ url_for('certifications') }}" class="btn btn-secondary"><span>🏆</span> Explore Certifications</a>
+      <a href="{{ url_for('reports') }}"       class="btn btn-secondary"><span>📄</span> Generate Career Report</a>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     IBM Granite AI Career Snapshot Widget
+══════════════════════════════════════════ -->
+{% if profile.profile_complete %}
+<div class="card mt-8" style="background:linear-gradient(135deg,rgba(15,98,254,0.06),rgba(124,58,237,0.06));border:1px solid rgba(15,98,254,0.2);">
+  <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:16px;">
+    <div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+        <div style="width:36px;height:36px;background:linear-gradient(135deg,#0f62fe,#7c3aed);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;flex-shrink:0;">🤖</div>
+        <div>
+          <div style="font-size:15px;font-weight:700;">✨ AI Career Snapshot</div>
+          <div style="font-size:12px;color:var(--text-muted);">Powered by IBM Granite · watsonx.ai</div>
+        </div>
+      </div>
+      <div style="font-size:13px;color:var(--text-secondary);">Get a personalized career assessment, your top strength, and 3 action items for this week — generated live by IBM Granite.</div>
+    </div>
+    <button id="dashInsightBtn" onclick="getDashboardInsights()"
+      class="btn btn-primary" style="white-space:nowrap;align-self:center;">
+      ✨ Get My AI Career Snapshot
+    </button>
+  </div>
+  <div id="dashInsightOutput" style="display:none;"></div>
+</div>
+{% else %}
+<div class="card mt-8" style="border:1px dashed var(--border-color);text-align:center;padding:32px;">
+  <div style="font-size:36px;margin-bottom:10px;">🤖</div>
+  <h3 style="margin-bottom:8px;">Unlock AI Career Insights</h3>
+  <p style="color:var(--text-secondary);font-size:13px;margin-bottom:16px;">Complete your student profile to get a personalized AI career snapshot powered by IBM Granite.</p>
+  <a href="{{ url_for('profile') }}" class="btn btn-primary">Complete Profile →</a>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+function getDashboardInsights() {
+  var btn = document.getElementById('dashInsightBtn');
+  var out = document.getElementById('dashInsightOutput');
+  btn.disabled = true;
+  btn.textContent = '⏳ IBM Granite is analysing…';
+  out.style.display = 'block';
+  out.innerHTML =
+    '<div style="color:var(--text-muted);font-size:13px;padding:16px;text-align:center;">' +
+    '<div style="width:28px;height:28px;border:3px solid #e0e0e0;border-top-color:#0f62fe;border-radius:50%;' +
+    'animation:wxo-spin 0.7s linear infinite;margin:0 auto 10px;"></div>' +
+    'IBM Granite is generating your career snapshot…</div>' +
+    '<style>@keyframes wxo-spin{to{transform:rotate(360deg)}}</style>';
+
+  fetch('/api/dashboard-insights', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: '{}'
+  })
+  .then(function (r) { return r.json(); })
+  .then(function (d) {
+    if (d.ok) {
+      out.innerHTML =
+        '<div style="border-top:1px solid rgba(15,98,254,0.2);padding-top:16px;">' +
+        '<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">' +
+        '<span style="font-size:16px;">🤖</span>' +
+        '<strong style="font-size:13.5px;color:var(--accent-blue);">IBM Granite Career Snapshot</strong>' +
+        '<span style="margin-left:auto;font-size:11px;color:var(--text-muted);">watsonx.ai</span></div>' +
+        '<div style="font-size:13.5px;line-height:1.85;white-space:pre-wrap;color:var(--text-primary);">' +
+        d.result.replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</div></div>';
+    } else {
+      out.innerHTML = '<div class="alert alert-warning"><span>⚠️</span><div>' + d.result + '</div></div>';
+    }
+    btn.disabled = false;
+    btn.innerHTML = '✨ Refresh AI Snapshot';
+  })
+  .catch(function () {
+    out.innerHTML = '<div class="alert alert-warning"><span>⚠️</span><div>Could not reach the server. Is Flask running?</div></div>';
+    btn.disabled = false;
+    btn.textContent = '✨ Get My AI Career Snapshot';
+  });
+}
+</script>
+{% endblock %}

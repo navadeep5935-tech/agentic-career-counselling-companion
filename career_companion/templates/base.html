@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Agentic Career Counseling Companion{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
+  {% block head %}{% endblock %}
+</head>
+<body>
+<div class="layout">
+
+  <!-- ── Sidebar Overlay (Mobile) ── -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- ══════════════════════════ SIDEBAR ══════════════════════════ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">AI</div>
+      <div>
+        <div class="brand-text">Career Companion</div>
+        <div class="brand-sub">Powered by IBM watsonx</div>
+      </div>
+    </div>
+
+    <div class="sidebar-section-label">Main</div>
+    <a href="{{ url_for('home') }}"          class="nav-item {% if active=='home' %}active{% endif %}">
+      <span class="nav-icon">🏠</span> Home
+    </a>
+    <a href="{{ url_for('about') }}"         class="nav-item {% if active=='about' %}active{% endif %}">
+      <span class="nav-icon">ℹ️</span> About
+    </a>
+    <a href="{{ url_for('profile') }}"       class="nav-item {% if active=='profile' %}active{% endif %}">
+      <span class="nav-icon">👤</span> Student Profile
+    </a>
+
+    <div class="sidebar-section-label">Career Intelligence</div>
+    <a href="{{ url_for('dashboard') }}"     class="nav-item {% if active=='dashboard' %}active{% endif %}">
+      <span class="nav-icon">📊</span> Career Dashboard
+    </a>
+    <a href="{{ url_for('mentor') }}"        class="nav-item {% if active=='mentor' %}active{% endif %}">
+      <span class="nav-icon">🤖</span> AI Career Mentor
+      <span class="nav-badge">AI</span>
+    </a>
+    <a href="{{ url_for('skill_gap') }}"     class="nav-item {% if active=='skill_gap' %}active{% endif %}">
+      <span class="nav-icon">🎯</span> Skill Gap Analysis
+    </a>
+    <a href="{{ url_for('roadmap') }}"       class="nav-item {% if active=='roadmap' %}active{% endif %}">
+      <span class="nav-icon">🗺️</span> Learning Roadmap
+    </a>
+
+    <div class="sidebar-section-label">Opportunities</div>
+    <a href="{{ url_for('projects') }}"      class="nav-item {% if active=='projects' %}active{% endif %}">
+      <span class="nav-icon">💡</span> Projects
+    </a>
+    <a href="{{ url_for('certifications') }}" class="nav-item {% if active=='certifications' %}active{% endif %}">
+      <span class="nav-icon">🏆</span> Certifications
+    </a>
+    <a href="{{ url_for('internship') }}"    class="nav-item {% if active=='internship' %}active{% endif %}">
+      <span class="nav-icon">🏢</span> Internship Center
+    </a>
+
+    <div class="sidebar-section-label">Growth</div>
+    <a href="{{ url_for('portfolio') }}"     class="nav-item {% if active=='portfolio' %}active{% endif %}">
+      <span class="nav-icon">🖼️</span> Portfolio Builder
+    </a>
+    <a href="{{ url_for('reports') }}"       class="nav-item {% if active=='reports' %}active{% endif %}">
+      <span class="nav-icon">📄</span> Career Reports
+    </a>
+    <a href="{{ url_for('industry') }}"      class="nav-item {% if active=='industry' %}active{% endif %}">
+      <span class="nav-icon">🌐</span> Industry Insights
+    </a>
+
+    <div class="sidebar-section-label">Support</div>
+    <a href="{{ url_for('contact') }}"       class="nav-item {% if active=='contact' %}active{% endif %}">
+      <span class="nav-icon">✉️</span> Contact
+    </a>
+
+    <!-- IBM Granite Status Badge -->
+    <div class="sidebar-ai-status" id="sidebarAiStatus">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="width:8px;height:8px;border-radius:50%;background:#6f6f6f;flex-shrink:0;" id="modelDot"></span>
+        <div>
+          <div style="font-size:10px;color:#8d8d8d;text-transform:uppercase;letter-spacing:0.05em;">AI Engine</div>
+          <div style="font-size:11.5px;font-weight:600;color:#c6c6c6;" id="modelNameDisplay">IBM Granite</div>
+        </div>
+      </div>
+      <div style="margin-top:6px;font-size:10px;color:#6f6f6f;" id="modelPlatform">watsonx.ai · us-south</div>
+    </div>
+
+    <div class="sidebar-footer">
+      © 2024 Career Companion<br>
+      <span style="color:#4589ff;">IBM watsonx.ai</span>
+    </div>
+  </aside>
+
+  <!-- ══════════════════════════ MAIN ══════════════════════════ -->
+  <div class="main-content">
+
+    <!-- Top Bar -->
+    <header class="topbar">
+      <button class="topbar-menu-btn" id="menuBtn">☰</button>
+      <span class="topbar-title">{% block topbar_title %}{% endblock %}</span>
+      <div class="topbar-spacer"></div>
+      <div class="topbar-actions">
+        <button class="btn-icon" id="themeToggle" onclick="toggleTheme()" title="Toggle dark mode">🌙</button>
+        <a href="{{ url_for('profile') }}" class="btn btn-sm btn-primary" style="gap:6px;">
+          <span>👤</span>
+          {% if profile is defined and profile.full_name %}
+            {{ profile.full_name.split()[0] }}
+          {% else %}
+            My Profile
+          {% endif %}
+        </a>
+      </div>
+    </header>
+
+    <!-- Page Content -->
+    <main class="page-content">
+      {% block content %}{% endblock %}
+    </main>
+
+  </div><!-- /main-content -->
+</div><!-- /layout -->
+
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+{% block scripts %}{% endblock %}
+
+<script>
+/* ── IBM Granite Model Status — fetch once on page load ── */
+(function () {
+  fetch('/api/model-status')
+    .then(function (r) { return r.json(); })
+    .then(function (d) {
+      if (d.ok) {
+        var dot  = document.getElementById('modelDot');
+        var name = document.getElementById('modelNameDisplay');
+        if (dot)  dot.style.background  = '#24a148';
+        var modelLabel = d.model || 'IBM Granite';
+        // Shorten display: ibm/granite-3-8b-instruct → Granite 3 8B
+        modelLabel = modelLabel.replace('ibm/', '').replace('meta-llama/', '')
+          .replace(/-instruct.*/, '').replace(/-chat.*/, '').replace(/-lab.*/, '');
+        modelLabel = modelLabel.split('-').map(function (w) {
+          return w.charAt(0).toUpperCase() + w.slice(1);
+        }).join(' ');
+        if (name) name.textContent = modelLabel;
+      }
+    })
+    .catch(function () { /* silently ignore — sidebar still shows */ });
+})();
+</script>
+</body>
+</html>

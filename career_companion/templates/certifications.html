@@ -1,0 +1,238 @@
+{% extends "base.html" %}
+{% block title %}Certifications — Career Companion{% endblock %}
+{% block topbar_title %}Certification Center{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div class="breadcrumb"><a href="/">Home</a><span>/</span>Certifications</div>
+  <h1>🏆 Certification Center</h1>
+  <p>Top certifications from IBM, Microsoft, AWS, Google, Coursera, and edX — with career impact guidance</p>
+</div>
+
+<!-- Filter Tabs -->
+<div class="tab-nav">
+  <button class="tab-btn active" data-tab="all-certs">All</button>
+  <button class="tab-btn" data-tab="ibm-certs">IBM</button>
+  <button class="tab-btn" data-tab="aws-certs">AWS</button>
+  <button class="tab-btn" data-tab="ms-certs">Microsoft</button>
+  <button class="tab-btn" data-tab="gcp-certs">Google</button>
+  <button class="tab-btn" data-tab="online-certs">Coursera / edX</button>
+</div>
+
+<div data-tab-group>
+
+  <!-- All / Overview table -->
+  <div id="all-certs" class="tab-pane active">
+    <div class="card mb-8">
+      <div class="card-header"><h3>🏅 Top Recommended Certifications</h3><span class="badge badge-green">Ranked by Career Value</span></div>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th><th>Certification</th><th>Provider</th><th>Difficulty</th><th>Career Value</th><th>Best For</th><th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% set certs_all = [
+              (1,"IBM AI Engineering Professional","IBM","Intermediate","⭐⭐⭐⭐⭐","ML Engineers, Data Scientists"),
+              (2,"AWS Solutions Architect Associate","AWS","Intermediate","⭐⭐⭐⭐⭐","Cloud Engineers, DevOps"),
+              (3,"Google Professional Data Engineer","Google","Advanced","⭐⭐⭐⭐⭐","Data Engineers, Cloud Architects"),
+              (4,"AZ-900 Azure Fundamentals","Microsoft","Beginner","⭐⭐⭐⭐","All Tech Roles"),
+              (5,"IBM Full Stack Developer","IBM","Intermediate","⭐⭐⭐⭐⭐","Full Stack Developers"),
+              (6,"Google IT Support Professional","Google","Beginner","⭐⭐⭐⭐","IT Support, Sysadmin"),
+              (7,"AWS Cloud Practitioner","AWS","Beginner","⭐⭐⭐⭐","Any tech role"),
+              (8,"IBM Data Science Professional","IBM","Intermediate","⭐⭐⭐⭐⭐","Data Analysts, Scientists"),
+              (9,"Microsoft Azure AI-900","Microsoft","Beginner","⭐⭐⭐⭐","AI Beginners"),
+              (10,"Deep Learning Specialization","Coursera/deeplearning.ai","Advanced","⭐⭐⭐⭐⭐","ML/DL Engineers"),
+            ] %}
+            {% for num, name, provider, diff, value, best in certs_all %}
+            <tr>
+              <td><strong>{{ num }}</strong></td>
+              <td style="font-weight:500;">{{ name }}</td>
+              <td>
+                {% if provider == 'IBM' %}<span class="badge badge-blue">IBM</span>
+                {% elif provider == 'AWS' %}<span class="badge badge-orange">AWS</span>
+                {% elif provider == 'Google' %}<span class="badge badge-red">Google</span>
+                {% elif provider == 'Microsoft' %}<span class="badge badge-teal">Microsoft</span>
+                {% else %}<span class="badge badge-purple">{{ provider }}</span>{% endif %}
+              </td>
+              <td><span class="badge {% if diff=='Beginner' %}badge-green{% elif diff=='Intermediate' %}badge-blue{% else %}badge-purple{% endif %}">{{ diff }}</span></td>
+              <td>{{ value }}</td>
+              <td style="font-size:12px;color:var(--text-muted);">{{ best }}</td>
+              <td><a href="{{ url_for('mentor') }}" class="btn btn-sm btn-outline">Learn More</a></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- IBM -->
+  <div id="ibm-certs" class="tab-pane">
+    <div class="grid grid-auto">
+      {% set ibm_certs = [
+        ("IBM AI Engineering Professional","Master AI/ML with IBM tools. Covers TensorFlow, PyTorch, Keras, and deep learning.","Intermediate","⭐⭐⭐⭐⭐","12 months","ML Engineers, Data Scientists"),
+        ("IBM Full Stack Cloud Developer","Build web apps with React, Node.js, Python, Docker, and Kubernetes on IBM Cloud.","Intermediate","⭐⭐⭐⭐⭐","4–6 months","Full Stack Developers"),
+        ("IBM Data Science Professional","Comprehensive data science curriculum with Python, SQL, ML, and IBM Watson.","Intermediate","⭐⭐⭐⭐⭐","3–5 months","Data Scientists, Analysts"),
+        ("IBM Applied AI Professional","Practical AI applications using IBM Watson, NLU, visual recognition, and chatbots.","Beginner","⭐⭐⭐⭐","2–3 months","Beginners in AI"),
+        ("IBM Cybersecurity Analyst","Network security, incident response, and penetration testing fundamentals.","Intermediate","⭐⭐⭐⭐⭐","6–8 months","Security Engineers"),
+        ("IBM DevOps and Software Engineering","CI/CD, Docker, Kubernetes, Microservices, and Agile practices.","Intermediate","⭐⭐⭐⭐⭐","4–6 months","DevOps, SRE roles"),
+      ] %}
+      {% for name, desc, diff, value, duration, target in ibm_certs %}
+      <div class="cert-card">
+        <div class="cert-header">
+          <div class="cert-logo ibm">IBM</div>
+          <div>
+            <div style="font-weight:600;font-size:14px;">{{ name }}</div>
+            <span class="badge {% if diff=='Beginner' %}badge-green{% elif diff=='Intermediate' %}badge-blue{% else %}badge-purple{% endif %}">{{ diff }}</span>
+          </div>
+        </div>
+        <p style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">{{ desc }}</p>
+        <div style="font-size:12px;display:flex;flex-direction:column;gap:4px;">
+          <div><span class="text-muted">Career Value: </span>{{ value }}</div>
+          <div><span class="text-muted">Duration: </span>{{ duration }}</div>
+          <div><span class="text-muted">Best For: </span>{{ target }}</div>
+        </div>
+        <div class="mt-4">
+          <a href="{{ url_for('mentor') }}" class="btn btn-sm btn-primary">Get Study Plan</a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- AWS -->
+  <div id="aws-certs" class="tab-pane">
+    <div class="grid grid-auto">
+      {% set aws_certs = [
+        ("AWS Cloud Practitioner","Entry-level cloud certification covering core AWS services and concepts.","Beginner","⭐⭐⭐⭐","1–2 months","Any tech role"),
+        ("AWS Solutions Architect Associate","Design highly available, scalable cloud architectures.","Intermediate","⭐⭐⭐⭐⭐","3–4 months","Cloud/Backend Engineers"),
+        ("AWS Developer Associate","Build and deploy applications on AWS using SDKs and services.","Intermediate","⭐⭐⭐⭐⭐","3–4 months","Software Developers"),
+        ("AWS Machine Learning Specialty","Build, train, and deploy ML models using AWS SageMaker.","Advanced","⭐⭐⭐⭐⭐","4–6 months","ML Engineers"),
+        ("AWS Solutions Architect Professional","Advanced architecture patterns and cost optimization on AWS.","Advanced","⭐⭐⭐⭐⭐","6–12 months","Senior Cloud Architects"),
+      ] %}
+      {% for name, desc, diff, value, duration, target in aws_certs %}
+      <div class="cert-card">
+        <div class="cert-header">
+          <div class="cert-logo aws">AWS</div>
+          <div>
+            <div style="font-weight:600;font-size:14px;">{{ name }}</div>
+            <span class="badge {% if diff=='Beginner' %}badge-green{% elif diff=='Intermediate' %}badge-blue{% else %}badge-purple{% endif %}">{{ diff }}</span>
+          </div>
+        </div>
+        <p style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">{{ desc }}</p>
+        <div style="font-size:12px;display:flex;flex-direction:column;gap:4px;">
+          <div><span class="text-muted">Career Value: </span>{{ value }}</div>
+          <div><span class="text-muted">Duration: </span>{{ duration }}</div>
+          <div><span class="text-muted">Best For: </span>{{ target }}</div>
+        </div>
+        <div class="mt-4">
+          <a href="{{ url_for('mentor') }}" class="btn btn-sm btn-primary">Get Study Plan</a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Microsoft -->
+  <div id="ms-certs" class="tab-pane">
+    <div class="grid grid-auto">
+      {% set ms_certs = [
+        ("AZ-900: Azure Fundamentals","Core Azure services, pricing, SLA, and cloud concepts.","Beginner","⭐⭐⭐⭐","2–4 weeks","All Roles"),
+        ("AZ-104: Azure Administrator","Manage Azure identities, governance, storage, and networking.","Intermediate","⭐⭐⭐⭐⭐","2–3 months","Cloud Admins"),
+        ("AI-900: Azure AI Fundamentals","AI concepts, Azure AI services, ML, and computer vision.","Beginner","⭐⭐⭐⭐","3–4 weeks","AI Beginners"),
+        ("DP-100: Azure Data Scientist","ML workflows, model training and deployment on Azure ML.","Advanced","⭐⭐⭐⭐⭐","3–5 months","Data Scientists"),
+        ("AZ-204: Azure Developer","Develop cloud solutions — functions, containers, auth on Azure.","Intermediate","⭐⭐⭐⭐⭐","3–4 months","Developers"),
+      ] %}
+      {% for name, desc, diff, value, duration, target in ms_certs %}
+      <div class="cert-card">
+        <div class="cert-header">
+          <div class="cert-logo ms">MS</div>
+          <div>
+            <div style="font-weight:600;font-size:14px;">{{ name }}</div>
+            <span class="badge {% if diff=='Beginner' %}badge-green{% elif diff=='Intermediate' %}badge-blue{% else %}badge-purple{% endif %}">{{ diff }}</span>
+          </div>
+        </div>
+        <p style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">{{ desc }}</p>
+        <div style="font-size:12px;display:flex;flex-direction:column;gap:4px;">
+          <div><span class="text-muted">Career Value: </span>{{ value }}</div>
+          <div><span class="text-muted">Duration: </span>{{ duration }}</div>
+          <div><span class="text-muted">Best For: </span>{{ target }}</div>
+        </div>
+        <div class="mt-4"><a href="{{ url_for('mentor') }}" class="btn btn-sm btn-primary">Get Study Plan</a></div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Google -->
+  <div id="gcp-certs" class="tab-pane">
+    <div class="grid grid-auto">
+      {% set gcp_certs = [
+        ("Google IT Support Professional","IT support fundamentals, networking, OS, and security.","Beginner","⭐⭐⭐⭐","3–6 months","IT Support"),
+        ("Google Data Analytics Professional","Data cleaning, visualization, SQL, and R programming.","Beginner","⭐⭐⭐⭐","6 months","Data Analysts"),
+        ("Google Professional Cloud Architect","Design and manage scalable GCP solutions.","Advanced","⭐⭐⭐⭐⭐","6–12 months","Cloud Architects"),
+        ("Google Professional Data Engineer","Build data processing systems using BigQuery, Dataflow, Pub/Sub.","Advanced","⭐⭐⭐⭐⭐","6–9 months","Data Engineers"),
+        ("Google Advanced Data Analytics","Advanced statistics, Python, ML, and predictive modeling.","Intermediate","⭐⭐⭐⭐⭐","6–9 months","Data Scientists"),
+      ] %}
+      {% for name, desc, diff, value, duration, target in gcp_certs %}
+      <div class="cert-card">
+        <div class="cert-header">
+          <div class="cert-logo gcp">GCP</div>
+          <div>
+            <div style="font-weight:600;font-size:14px;">{{ name }}</div>
+            <span class="badge {% if diff=='Beginner' %}badge-green{% elif diff=='Intermediate' %}badge-blue{% else %}badge-purple{% endif %}">{{ diff }}</span>
+          </div>
+        </div>
+        <p style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">{{ desc }}</p>
+        <div style="font-size:12px;display:flex;flex-direction:column;gap:4px;">
+          <div><span class="text-muted">Career Value: </span>{{ value }}</div>
+          <div><span class="text-muted">Duration: </span>{{ duration }}</div>
+          <div><span class="text-muted">Best For: </span>{{ target }}</div>
+        </div>
+        <div class="mt-4"><a href="{{ url_for('mentor') }}" class="btn btn-sm btn-primary">Get Study Plan</a></div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Coursera / edX -->
+  <div id="online-certs" class="tab-pane">
+    <div class="grid grid-auto">
+      {% set online_certs = [
+        ("Deep Learning Specialization","deeplearning.ai/Coursera","Neural networks, CNNs, RNNs, and transformer architectures.","Advanced","⭐⭐⭐⭐⭐","cour"),
+        ("Machine Learning Specialization","Stanford/Coursera","Supervised, unsupervised, and reinforcement learning.","Intermediate","⭐⭐⭐⭐⭐","cour"),
+        ("CS50: Introduction to CS","Harvard/edX","Foundational computer science in C, Python, JavaScript.","Beginner","⭐⭐⭐⭐⭐","edx"),
+        ("MicroMasters Data Science","MIT/edX","Probability, statistics, ML, and big data methods.","Advanced","⭐⭐⭐⭐⭐","edx"),
+        ("Full Stack Web Development","Meta/Coursera","React, Node.js, databases, and deployment.","Intermediate","⭐⭐⭐⭐⭐","cour"),
+        ("Python for Everybody","Univ. Michigan/Coursera","Python basics, data structures, APIs, and databases.","Beginner","⭐⭐⭐⭐","cour"),
+      ] %}
+      {% for name, provider, desc, diff, value, logo_type in online_certs %}
+      <div class="cert-card">
+        <div class="cert-header">
+          <div class="cert-logo {{ logo_type }}">{{ 'Cour' if logo_type=='cour' else 'edX' }}</div>
+          <div>
+            <div style="font-weight:600;font-size:14px;">{{ name }}</div>
+            <div style="font-size:11px;color:var(--text-muted);">{{ provider }}</div>
+          </div>
+        </div>
+        <p style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">{{ desc }}</p>
+        <div style="font-size:12px;display:flex;flex-direction:column;gap:4px;">
+          <div><span class="badge {% if diff=='Beginner' %}badge-green{% elif diff=='Intermediate' %}badge-blue{% else %}badge-purple{% endif %}">{{ diff }}</span></div>
+          <div><span class="text-muted">Career Value: </span>{{ value }}</div>
+        </div>
+        <div class="mt-4"><a href="{{ url_for('mentor') }}" class="btn btn-sm btn-primary">Get Study Plan</a></div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+</div><!-- /tab-group -->
+
+<div class="alert alert-info mt-8">
+  <span>🤖</span>
+  <div><strong>Not sure which certification to start with?</strong> Ask the <a href="{{ url_for('mentor') }}">AI Career Mentor</a>: <em>"Which certification should I pursue first for a career in {{ profile.preferred_industry or 'technology' }}?"</em></div>
+</div>
+
+{% endblock %}

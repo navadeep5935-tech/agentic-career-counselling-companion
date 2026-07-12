@@ -1,0 +1,276 @@
+{% extends "base.html" %}
+{% block title %}Portfolio Builder — Career Companion{% endblock %}
+{% block topbar_title %}Portfolio Builder{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div class="breadcrumb"><a href="/">Home</a><span>/</span>Portfolio Builder</div>
+  <h1>🖼️ Portfolio Builder</h1>
+  <p>Build a standout personal brand across resume, LinkedIn, GitHub, and the web</p>
+</div>
+
+<div class="tab-nav">
+  <button class="tab-btn active" data-tab="overview-port">📋 Overview</button>
+  <button class="tab-btn" data-tab="resume-port">📄 Resume</button>
+  <button class="tab-btn" data-tab="linkedin-port">🔵 LinkedIn</button>
+  <button class="tab-btn" data-tab="github-port">⚫ GitHub</button>
+  <button class="tab-btn" data-tab="website-port">🌐 Website</button>
+  <button class="tab-btn" data-tab="projects-port">💡 Projects</button>
+</div>
+
+<div data-tab-group>
+
+  <!-- Overview -->
+  <div id="overview-port" class="tab-pane active">
+    <div class="hero" style="margin-bottom:24px;">
+      <h1 style="font-size:22px;">Your Personal Brand = Your Career Currency</h1>
+      <p>In today's market, your online presence matters as much as your degree. A strong portfolio can get you noticed by top companies even before applying.</p>
+    </div>
+    <div class="grid grid-4">
+      {% set brand_elements = [
+        ("📄","Resume","Your professional story on one page","4.5/5 Employers Review","badge-blue"),
+        ("🔵","LinkedIn Profile","Professional network &amp; social proof","87% recruiters use LinkedIn","badge-blue"),
+        ("⚫","GitHub Profile","Living proof of your coding skills","Top signal for developers","badge-gray"),
+        ("🌐","Personal Website","Control your narrative completely","Sets you apart from competition","badge-purple"),
+      ] %}
+      {% for icon, title, desc, stat, badge_class in brand_elements %}
+      <div class="card text-center" style="padding:24px 16px;">
+        <div style="font-size:32px;margin-bottom:10px;">{{ icon }}</div>
+        <h3 style="font-size:14px;font-weight:600;margin-bottom:6px;">{{ title }}</h3>
+        <p style="font-size:12px;color:var(--text-secondary);margin-bottom:10px;">{{ desc }}</p>
+        <span class="badge {{ badge_class }}">{{ stat }}</span>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="card mt-8">
+      <div class="card-header"><h3>📊 Portfolio Completeness Score</h3></div>
+      {% set port_items = [
+        ("Resume Created & Updated", 95, "green"),
+        ("LinkedIn Profile Optimized", 80, "blue"),
+        ("GitHub Profile Active", 70, "teal"),
+        ("3+ Portfolio Projects Pushed", 60, "purple"),
+        ("Personal Website Live", 40, "orange"),
+      ] %}
+      {% for item, val, color in port_items %}
+      <div class="progress-bar-container">
+        <div class="progress-label"><span>{{ item }}</span><span>{{ val }}%</span></div>
+        <div class="progress-bar"><div class="progress-fill {{ color }}" data-value="{{ val }}" style="width:0%"></div></div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Resume -->
+  <div id="resume-port" class="tab-pane">
+    <div class="grid grid-2">
+      <div class="card">
+        <div class="card-header"><h3>📄 Resume Optimization</h3></div>
+        <div class="alert alert-info">
+          <span>💡</span><div>A strong resume is your first impression. Recruiters spend only <strong>7 seconds</strong> reviewing each resume.</div>
+        </div>
+        {% set resume_opts = [
+          ("Format & Design","Use a clean ATS-friendly template — no graphics, tables, or columns. Recommended: Jake's Resume, Novoresume."),
+          ("Header Section","Full name (large), professional email, phone, LinkedIn URL, GitHub URL, city/remote preference."),
+          ("Summary Statement","3 lines: Who you are | What you offer | Your immediate goal. Include target role and key tech."),
+          ("Skills Section","Group by category: Programming Languages | Frameworks | Tools | Databases | Cloud | ML Libraries."),
+          ("Projects Section","Most important for freshers. Include: Project name, tech stack, your role, and quantified impact."),
+          ("Education","Degree, CGPA (if 7.5+), relevant coursework, college name, location, graduation year."),
+          ("Achievements","Hackathons, competitive programming rankings, open source contributions, publications."),
+          ("PDF Format","Always submit as PDF. Name the file: FirstName_LastName_Resume.pdf."),
+        ] %}
+        {% for title, tip in resume_opts %}
+        <div style="padding:10px 0;border-bottom:1px solid var(--border-color);">
+          <div style="font-size:14px;font-weight:600;color:var(--text-primary);margin-bottom:3px;">{{ title }}</div>
+          <div style="font-size:13px;color:var(--text-secondary);">{{ tip }}</div>
+        </div>
+        {% endfor %}
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>🔧 Free Resume Tools</h3></div>
+        {% set tools = [
+          ("Canva Resume Builder","Drag-and-drop professional templates. Free tier available.","🎨"),
+          ("Resume.io","ATS-optimized templates with real-time preview.","📋"),
+          ("Novoresume","Modern templates specifically designed for tech roles.","⚡"),
+          ("Jake's Resume (LaTeX)","The gold standard for software engineering resumes.","💻"),
+          ("VisualCV","Online resume hosting with viewer analytics.","📊"),
+          ("Jobscan","ATS score checker — paste your resume vs job description.","🔍"),
+        ] %}
+        {% for name, desc, icon in tools %}
+        <div style="display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--border-color);">
+          <span style="font-size:24px;flex-shrink:0;">{{ icon }}</span>
+          <div><div style="font-size:14px;font-weight:600;">{{ name }}</div><div style="font-size:12px;color:var(--text-secondary);">{{ desc }}</div></div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- LinkedIn -->
+  <div id="linkedin-port" class="tab-pane">
+    <div class="grid grid-2">
+      <div class="card">
+        <div class="card-header"><h3>🔵 LinkedIn Profile Optimization</h3></div>
+        {% set linkedin_tips = [
+          ("Professional Photo","Clear headshot, professional background, good lighting. First impressions matter."),
+          ("Headline Formula","[Current Role/Student] | [Key Skill 1] | [Key Skill 2] | [Goal]. E.g.: CS Student | Python | ML | Aspiring Data Scientist"),
+          ("About / Summary","Tell your story: What you do, what drives you, what you're looking for. Include keywords."),
+          ("Featured Section","Pin your best project, GitHub profile, personal website, or top article."),
+          ("Experience Section","Include internships, freelance work, campus projects, and volunteer work."),
+          ("Skills & Endorsements","Add 20+ skills and get endorsements from professors and peers."),
+          ("Recommendations","Ask 2–3 professors, mentors, or peers for written recommendations."),
+          ("Activity & Posts","Post about learning, share projects, comment on industry posts — signal activity to recruiters."),
+          ("Connect Strategically","Connect with alumni, industry professionals, and peers. Personalize connection requests."),
+          ("Open to Work Badge","Enable 'Open to Work' to signal recruiters. Set your target roles and locations."),
+        ] %}
+        {% for title, tip in linkedin_tips %}
+        <div style="padding:10px 0;border-bottom:1px solid var(--border-color);font-size:13.5px;">
+          <div style="font-weight:600;margin-bottom:2px;">{{ title }}</div>
+          <div style="color:var(--text-secondary);">{{ tip }}</div>
+        </div>
+        {% endfor %}
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>📊 LinkedIn Score Checklist</h3></div>
+        {% set linkedin_checks = [
+          ("Profile Photo", True, "green"),
+          ("Strong Headline", True, "green"),
+          ("About Summary (200+ words)", False, "orange"),
+          ("5+ Featured Items", False, "orange"),
+          ("Education Complete", True, "green"),
+          ("3+ Experience Entries", False, "orange"),
+          ("20+ Skills Listed", False, "red"),
+          ("2+ Recommendations", False, "red"),
+          ("500+ Connections", False, "orange"),
+          ("Active Posting (monthly)", False, "orange"),
+        ] %}
+        {% for item, done, color in linkedin_checks %}
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border-color);font-size:13.5px;">
+          <span>{{ '✅' if done else '⬜' }} {{ item }}</span>
+          <span class="badge badge-{{ color }}">{{ 'Done' if done else 'Todo' }}</span>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- GitHub -->
+  <div id="github-port" class="tab-pane">
+    <div class="grid grid-2">
+      <div class="card">
+        <div class="card-header"><h3>⚫ GitHub Profile Optimization</h3></div>
+        {% set github_tips = [
+          ("Profile README","Create a special repo (username/username) with a compelling README.md — include your skills, projects, and stats badges."),
+          ("Pin Best Repositories","Pin your top 6 most impressive and relevant repositories on your profile."),
+          ("Consistent Commits","Aim for daily commits — even small documentation or learning exercises keep your activity graph green."),
+          ("Quality READMEs","Every project must have: Description, screenshots/demo, tech stack, installation steps, and usage guide."),
+          ("Write Clean Code","Use proper naming, comments, and organize code in logical folder structures. Code quality is judged."),
+          ("Add Topics/Tags","Tag repositories with relevant technologies: python, machine-learning, flask, react, etc."),
+          ("Stars & Following","Star useful repositories and follow relevant developers to build your developer community."),
+          ("Contribute to Open Source","Find beginner-friendly issues on GitHub with 'good first issue' label."),
+        ] %}
+        {% for title, tip in github_tips %}
+        <div style="padding:10px 0;border-bottom:1px solid var(--border-color);font-size:13.5px;">
+          <div style="font-weight:600;margin-bottom:2px;">{{ title }}</div>
+          <div style="color:var(--text-secondary);">{{ tip }}</div>
+        </div>
+        {% endfor %}
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>💡 GitHub Profile README Ideas</h3></div>
+        <div style="background:var(--bg-secondary);border-radius:8px;padding:16px;font-family:monospace;font-size:12px;margin-bottom:14px;overflow-x:auto;">
+          <div style="color:var(--accent-blue);"># Hi, I'm {{ profile.full_name or 'Your Name' }} 👋</div>
+          <br>
+          <div style="color:var(--text-secondary);">🎓 {{ profile.education or 'CS Student' }} | {{ profile.branch or 'Computer Science' }}</div>
+          <div style="color:var(--text-secondary);">🔭 Building projects in {{ profile.preferred_industry or 'Technology' }}</div>
+          <div style="color:var(--text-secondary);">🌱 Currently learning advanced {{ (profile.skills[0] if profile.skills else 'Python') }}</div>
+          <div style="color:var(--text-secondary);">📫 Open to internship opportunities</div>
+          <br>
+          <div style="color:var(--accent-teal);">## 🛠️ Tech Stack</div>
+          <div style="color:var(--text-secondary);">{{ profile.skills | join(' | ') if profile.skills else 'Python | SQL | Git' }}</div>
+        </div>
+        <div class="tag-list">
+          <span class="badge badge-gray">GitHub Stats Widget</span>
+          <span class="badge badge-gray">Top Languages Card</span>
+          <span class="badge badge-gray">Streak Stats</span>
+          <span class="badge badge-gray">WakaTime Widget</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Website -->
+  <div id="website-port" class="tab-pane">
+    <div class="grid grid-2">
+      <div class="card">
+        <div class="card-header"><h3>🌐 Personal Website Guide</h3></div>
+        <div class="alert alert-success"><span>🏆</span><div>Students with personal portfolio websites receive <strong>3x more callback rates</strong> compared to those without.</div></div>
+        {% set web_tips = [
+          ("Choose a Platform","GitHub Pages (free), Netlify (free), Vercel (free) — zero cost to host a static portfolio."),
+          ("Domain Name","Get a custom domain at Namecheap/Google Domains (~$10/year) — e.g., firstnamelastname.dev."),
+          ("Essential Pages","Home/Hero, About Me, Projects, Skills, Certifications, Blog, Contact."),
+          ("Performance","Lighthouse score 90+. Fast load times, mobile responsive, accessible."),
+          ("SEO Basics","Add your name, role, and location as meta tags so recruiters can Google you."),
+          ("Contact Form","Add a contact form or clear email link. Make it easy for recruiters to reach you."),
+          ("Analytics","Add Google Analytics or similar to see how many recruiters visit your site."),
+        ] %}
+        {% for title, tip in web_tips %}
+        <div style="padding:10px 0;border-bottom:1px solid var(--border-color);font-size:13.5px;">
+          <div style="font-weight:600;margin-bottom:2px;">{{ title }}</div>
+          <div style="color:var(--text-secondary);">{{ tip }}</div>
+        </div>
+        {% endfor %}
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>🎨 Free Website Builders</h3></div>
+        {% set builders = [
+          ("GitHub Pages","Free static hosting with custom domain. Best for devs.","⚫","https://pages.github.com"),
+          ("Netlify","Drag-and-drop static site hosting with CI/CD.","🟢","https://netlify.com"),
+          ("Vercel","Best for React/Next.js portfolio sites.","⚡","https://vercel.com"),
+          ("WordPress.com","Easy-to-use CMS for non-developers.","🔵","https://wordpress.com"),
+          ("Webflow","Design-first website builder with CMS.","🟣","https://webflow.com"),
+          ("Notion + super.so","Turn Notion pages into a website in minutes.","⬜","https://super.so"),
+        ] %}
+        {% for name, desc, icon, url in builders %}
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border-color);">
+          <div style="display:flex;gap:10px;align-items:center;">
+            <span style="font-size:20px;">{{ icon }}</span>
+            <div style="font-size:13.5px;"><strong>{{ name }}</strong><div style="font-size:12px;color:var(--text-secondary);">{{ desc }}</div></div>
+          </div>
+          <a href="{{ url }}" class="btn btn-sm btn-outline" target="_blank">Visit</a>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Projects Showcase -->
+  <div id="projects-port" class="tab-pane">
+    <div class="card mb-8">
+      <div class="card-header"><h3>💡 Project Showcase Strategy</h3></div>
+      <div class="grid grid-3">
+        <div style="text-align:center;padding:20px;">
+          <div style="font-size:36px;margin-bottom:8px;">1️⃣</div>
+          <h4 style="margin-bottom:6px;">Choose Wisely</h4>
+          <p style="font-size:13px;color:var(--text-secondary);">Show 3–5 quality projects, not 20 mediocre ones. Quality over quantity always wins.</p>
+        </div>
+        <div style="text-align:center;padding:20px;">
+          <div style="font-size:36px;margin-bottom:8px;">2️⃣</div>
+          <h4 style="margin-bottom:6px;">Document Everything</h4>
+          <p style="font-size:13px;color:var(--text-secondary);">Every project needs a README, screenshots, demo link, and clear explanation of your role.</p>
+        </div>
+        <div style="text-align:center;padding:20px;">
+          <div style="font-size:36px;margin-bottom:8px;">3️⃣</div>
+          <h4 style="margin-bottom:6px;">Measure Impact</h4>
+          <p style="font-size:13px;color:var(--text-secondary);">Quantify everything: 1000 users, 40% faster, 99.9% uptime — recruiters love numbers.</p>
+        </div>
+      </div>
+    </div>
+    <div class="alert alert-info">
+      <span>🤖</span>
+      <div><strong>Need project ideas for your portfolio?</strong> Visit the <a href="{{ url_for('projects') }}">Project Hub</a> or ask the <a href="{{ url_for('mentor') }}">AI Mentor</a>.</div>
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}

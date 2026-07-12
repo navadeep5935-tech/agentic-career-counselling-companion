@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% block title %}Home — Agentic Career Counseling Companion{% endblock %}
+{% block topbar_title %}Home{% endblock %}
+{% block content %}
+
+<!-- Hero -->
+<div class="hero">
+  <h1>🚀 Agentic Career Counseling Companion</h1>
+  <p>Your AI-powered career development platform — powered by IBM watsonx Orchestrate. Discover your strengths, bridge skill gaps, and build a roadmap to your dream career.</p>
+  <div class="hero-actions">
+    {% if profile.profile_complete %}
+      <a href="{{ url_for('dashboard') }}" class="btn btn-white btn-lg">View My Dashboard</a>
+      <a href="{{ url_for('mentor') }}"    class="btn btn-ghost-white btn-lg">Chat with AI Mentor</a>
+    {% else %}
+      <a href="{{ url_for('profile') }}"   class="btn btn-white btn-lg">Get Started — Create Profile</a>
+      <a href="{{ url_for('mentor') }}"    class="btn btn-ghost-white btn-lg">Chat with AI Mentor</a>
+    {% endif %}
+  </div>
+</div>
+
+{% if not profile.profile_complete %}
+<div class="alert alert-info">
+  <span>💡</span>
+  <div><strong>Welcome!</strong> Complete your <a href="{{ url_for('profile') }}">Student Profile</a> to unlock personalized career insights, skill gap analysis, and your custom learning roadmap.</div>
+</div>
+{% endif %}
+
+<!-- Feature Grid -->
+<div class="page-header mt-8">
+  <h1>Platform Features</h1>
+  <p>Everything you need to plan, build, and accelerate your career</p>
+</div>
+
+<div class="grid grid-3" style="margin-bottom:32px;">
+  <a href="{{ url_for('dashboard') }}" style="text-decoration:none;">
+    <div class="feature-card">
+      <div class="feature-icon">📊</div>
+      <h3>Career Intelligence Dashboard</h3>
+      <p>Track your Career Readiness, Employability Score, and Learning Progress with interactive charts and visual analytics.</p>
+    </div>
+  </a>
+  <a href="{{ url_for('mentor') }}" style="text-decoration:none;">
+    <div class="feature-card">
+      <div class="feature-icon">🤖</div>
+      <h3>AI Career Mentor</h3>
+      <p>Get personalized career advice powered by IBM watsonx Orchestrate. Ask about career paths, certifications, projects, and more.</p>
+    </div>
+  </a>
+  <a href="{{ url_for('skill_gap') }}" style="text-decoration:none;">
+    <div class="feature-card">
+      <div class="feature-icon">🎯</div>
+      <h3>Skill Gap Analysis</h3>
+      <p>Identify your current skills vs. what the industry demands. Get actionable recommendations to close the gap.</p>
+    </div>
+  </a>
+  <a href="{{ url_for('roadmap') }}" style="text-decoration:none;">
+    <div class="feature-card">
+      <div class="feature-icon">🗺️</div>
+      <h3>Personalized Learning Roadmap</h3>
+      <p>Short, medium, and long-term career development plans with technologies, courses, certifications, and milestones.</p>
+    </div>
+  </a>
+  <a href="{{ url_for('projects') }}" style="text-decoration:none;">
+    <div class="feature-card">
+      <div class="feature-icon">💡</div>
+      <h3>Project Recommendation Hub</h3>
+      <p>Curated beginner-to-advanced projects that build real-world portfolio value and demonstrate your skills to employers.</p>
+    </div>
+  </a>
+  <a href="{{ url_for('certifications') }}" style="text-decoration:none;">
+    <div class="feature-card">
+      <div class="feature-icon">🏆</div>
+      <h3>Certification Center</h3>
+      <p>Browse IBM, AWS, Google, Microsoft, and Coursera certifications with difficulty levels and career impact ratings.</p>
+    </div>
+  </a>
+  <a href="{{ url_for('internship') }}" style="text-decoration:none;">
+    <div class="feature-card">
+      <div class="feature-icon">🏢</div>
+      <h3>Internship &amp; Opportunity Center</h3>
+      <p>Preparation tips, application strategies, interview guidance, and resume building resources to land your first role.</p>
+    </div>
+  </a>
+  <a href="{{ url_for('portfolio') }}" style="text-decoration:none;">
+    <div class="feature-card">
+      <div class="feature-icon">🖼️</div>
+      <h3>Portfolio Builder</h3>
+      <p>Resume, LinkedIn, GitHub optimization tips and a personal branding strategy to stand out in the job market.</p>
+    </div>
+  </a>
+  <a href="{{ url_for('industry') }}" style="text-decoration:none;">
+    <div class="feature-card">
+      <div class="feature-icon">🌐</div>
+      <h3>Industry Insights</h3>
+      <p>Stay ahead with emerging technologies, high-demand skills, industry trends, and future career growth areas.</p>
+    </div>
+  </a>
+</div>
+
+<!-- Stats Row -->
+<div class="card mt-8">
+  <div class="card-header">
+    <h3>Platform at a Glance</h3>
+  </div>
+  <div class="grid grid-4">
+    <div class="text-center" style="padding:16px 0;">
+      <div style="font-size:36px;font-weight:700;color:var(--accent-blue);">500+</div>
+      <div class="text-muted">Career Resources</div>
+    </div>
+    <div class="text-center" style="padding:16px 0;">
+      <div style="font-size:36px;font-weight:700;color:var(--accent-teal);">100+</div>
+      <div class="text-muted">Certifications Tracked</div>
+    </div>
+    <div class="text-center" style="padding:16px 0;">
+      <div style="font-size:36px;font-weight:700;color:var(--accent-purple);">50+</div>
+      <div class="text-muted">Project Templates</div>
+    </div>
+    <div class="text-center" style="padding:16px 0;">
+      <div style="font-size:36px;font-weight:700;color:var(--accent-green);">AI</div>
+      <div class="text-muted">Powered by watsonx</div>
+    </div>
+  </div>
+</div>
+
+<!-- Quick Start CTA -->
+<div class="card mt-8" style="background:var(--bg-secondary);text-align:center;padding:40px;">
+  <h2 style="font-size:22px;margin-bottom:10px;">Ready to Begin Your Career Journey?</h2>
+  <p style="color:var(--text-secondary);max-width:480px;margin:0 auto 20px;">Create your student profile in 2 minutes and unlock AI-personalized career guidance, skill analysis, and a custom development roadmap.</p>
+  <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+    <a href="{{ url_for('profile') }}" class="btn btn-primary btn-lg">Create My Profile</a>
+    <a href="{{ url_for('mentor') }}"  class="btn btn-secondary btn-lg">Ask AI Mentor</a>
+  </div>
+</div>
+
+{% endblock %}

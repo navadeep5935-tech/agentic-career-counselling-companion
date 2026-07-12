@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block title %}Contact — Career Companion{% endblock %}
+{% block topbar_title %}Contact{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div class="breadcrumb"><a href="/">Home</a><span>/</span>Contact</div>
+  <h1>✉️ Contact &amp; Support</h1>
+  <p>Get in touch with the Career Companion team</p>
+</div>
+
+<div class="grid grid-2" style="align-items:start;">
+
+  <!-- Contact Info -->
+  <div>
+    <div class="card mb-4">
+      <div class="card-header"><h3>📞 Contact Information</h3></div>
+      {% set contacts = [
+        ("🤖","AI Career Mentor","Available 24/7 via the AI Career Mentor page.","Chat Now","mentor"),
+        ("📧","Email Support","For technical issues or feedback.","support@careercompanion.ai","#"),
+        ("🐙","GitHub","Report bugs, contribute code, or star the project.","github.com/career-companion","#"),
+        ("💼","LinkedIn","Follow updates, job postings, and platform news.","linkedin.com/company/career-companion","#"),
+      ] %}
+      {% for icon, title, desc, link, url in contacts %}
+      <div style="display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--border-color);">
+        <span style="font-size:24px;flex-shrink:0;">{{ icon }}</span>
+        <div style="flex:1;">
+          <div style="font-weight:600;font-size:14px;margin-bottom:2px;">{{ title }}</div>
+          <div style="font-size:13px;color:var(--text-secondary);">{{ desc }}</div>
+          {% if url == "mentor" %}
+          <a href="{{ url_for('mentor') }}" class="btn btn-sm btn-primary mt-4">Open AI Mentor</a>
+          {% else %}
+          <div style="font-size:12px;color:var(--accent-blue);margin-top:4px;">{{ link }}</div>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="card">
+      <div class="card-header"><h3>❓ FAQ</h3></div>
+      {% set faqs = [
+        ("How do I get personalized career advice?", "Complete your Student Profile first, then visit the AI Career Mentor page. The more details you provide, the more personalized the advice."),
+        ("Is my profile data stored securely?", "Profile data is stored in your browser session. No data is sent to external servers beyond the IBM watsonx Orchestrate agent."),
+        ("How do I generate a career report?", "Visit the Career Reports page after completing your profile. Use Ctrl+P / Cmd+P to save as PDF."),
+        ("Can I use this on mobile?", "Yes! The platform is fully responsive and mobile-friendly with a collapsible sidebar."),
+        ("How do I switch to dark mode?", "Click the moon icon (🌙) in the top-right navigation bar to toggle dark mode."),
+      ] %}
+      {% for q, a in faqs %}
+      <div style="padding:12px 0;border-bottom:1px solid var(--border-color);">
+        <div style="font-weight:600;font-size:13.5px;margin-bottom:4px;color:var(--text-primary);">{{ q }}</div>
+        <div style="font-size:13px;color:var(--text-secondary);">{{ a }}</div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Contact Form (Static) -->
+  <div>
+    <div class="card mb-4">
+      <div class="card-header"><h3>📝 Send Feedback</h3></div>
+      <div class="alert alert-info">
+        <span>💡</span>
+        <div>For immediate career guidance, use the <a href="{{ url_for('mentor') }}">AI Career Mentor</a>. This form is for platform feedback only.</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Your Name</label>
+        <input class="form-control" placeholder="Full name" value="{{ profile.full_name if profile.profile_complete else '' }}" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input type="email" class="form-control" placeholder="your@email.com" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Subject</label>
+        <select class="form-control">
+          <option>Bug Report</option>
+          <option>Feature Request</option>
+          <option>General Feedback</option>
+          <option>Partnership Inquiry</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Message</label>
+        <textarea class="form-control" rows="5" placeholder="Describe your feedback or issue..."></textarea>
+      </div>
+      <button class="btn btn-primary w-100" onclick="alert('Thank you for your feedback! We will get back to you soon.')">
+        📤 Send Feedback
+      </button>
+    </div>
+
+    <!-- Platform Info -->
+    <div class="card">
+      <div class="card-header"><h3>ℹ️ Platform Information</h3></div>
+      <div style="font-size:13.5px;display:flex;flex-direction:column;gap:10px;">
+        <div style="display:flex;justify-content:space-between;"><span class="text-muted">Platform</span><strong>Agentic Career Counseling Companion</strong></div>
+        <div style="display:flex;justify-content:space-between;"><span class="text-muted">AI Engine</span><strong>IBM watsonx Orchestrate</strong></div>
+        <div style="display:flex;justify-content:space-between;"><span class="text-muted">Backend</span><strong>Python Flask</strong></div>
+        <div style="display:flex;justify-content:space-between;"><span class="text-muted">Version</span><strong>1.0.0</strong></div>
+        <div style="display:flex;justify-content:space-between;"><span class="text-muted">License</span><strong>MIT Open Source</strong></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}

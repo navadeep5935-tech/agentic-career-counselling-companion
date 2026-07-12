@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+{% block title %}Student Profile — Career Companion{% endblock %}
+{% block topbar_title %}Student Profile{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div class="breadcrumb"><a href="/">Home</a><span>/</span>Student Profile</div>
+  <h1>Student Career Profile</h1>
+  <p>Complete your profile to unlock personalized AI-powered career guidance</p>
+</div>
+
+{% if not profile.profile_complete %}
+<div class="alert alert-info mb-8">
+  <span>💡</span>
+  <div>Fill out the form below. Your information is used to personalize your dashboard, skill gap analysis, roadmap, and AI mentor conversations.</div>
+</div>
+{% else %}
+<div class="alert alert-success mb-8">
+  <span>✅</span>
+  <div><strong>Profile Complete!</strong> Your career intelligence dashboard and personalized recommendations are ready. <a href="{{ url_for('dashboard') }}">View Dashboard →</a></div>
+</div>
+{% endif %}
+
+<div class="grid grid-2" style="align-items:start;gap:24px;">
+  <!-- Form -->
+  <div class="card">
+    <div class="card-header"><h3>📋 Profile Information</h3></div>
+    <form method="POST" action="{{ url_for('profile') }}" id="profileForm">
+
+      <div class="grid grid-2">
+        <div class="form-group">
+          <label class="form-label">Full Name <span class="required">*</span></label>
+          <input name="full_name" class="form-control" placeholder="e.g. Arjun Sharma" value="{{ profile.full_name }}" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Education Level</label>
+          <select name="education" class="form-control">
+            {% for opt in ['B.Tech / B.E.', 'B.Sc', 'BCA', 'B.Com', 'MBA', 'M.Tech / M.E.', 'M.Sc', 'Ph.D', 'Diploma', 'Other'] %}
+              <option value="{{ opt }}" {% if profile.education == opt %}selected{% endif %}>{{ opt }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <div class="grid grid-2">
+        <div class="form-group">
+          <label class="form-label">Degree / Specialization</label>
+          <input name="degree" class="form-control" placeholder="e.g. Computer Science" value="{{ profile.degree }}" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Branch / Stream</label>
+          <input name="branch" class="form-control" placeholder="e.g. Artificial Intelligence" value="{{ profile.branch }}" />
+        </div>
+      </div>
+
+      <div class="grid grid-2">
+        <div class="form-group">
+          <label class="form-label">Year of Study</label>
+          <select name="year_of_study" class="form-control">
+            {% for opt in ['1st Year', '2nd Year', '3rd Year', '4th Year', 'Final Year', 'Graduate', 'Postgraduate'] %}
+              <option value="{{ opt }}" {% if profile.year_of_study == opt %}selected{% endif %}>{{ opt }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">CGPA / Percentage</label>
+          <input name="cgpa" type="number" step="0.01" min="0" max="10" class="form-control" placeholder="e.g. 8.5 (out of 10)" value="{{ profile.cgpa }}" />
+          <div class="form-hint">Enter CGPA (out of 10) or percentage (0–100)</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Technical Skills</label>
+        <input name="skills" class="form-control" placeholder="e.g. Python, SQL, Machine Learning, Git, React" value="{{ profile.skills | join(', ') }}" />
+        <div class="form-hint">Separate skills with commas</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Interests</label>
+        <input name="interests" class="form-control" placeholder="e.g. Data Science, Web Development, Open Source" value="{{ profile.interests | join(', ') }}" />
+        <div class="form-hint">Separate interests with commas</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Strengths</label>
+        <input name="strengths" class="form-control" placeholder="e.g. Problem Solving, Communication, Fast Learner" value="{{ profile.strengths | join(', ') }}" />
+        <div class="form-hint">Separate strengths with commas</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Career Goals</label>
+        <textarea name="career_goals" class="form-control" rows="3" placeholder="e.g. Become a Machine Learning Engineer at a top tech company within 3 years">{{ profile.career_goals }}</textarea>
+      </div>
+
+      <div class="grid grid-2">
+        <div class="form-group">
+          <label class="form-label">Preferred Industry</label>
+          <select name="preferred_industry" class="form-control">
+            {% for opt in ['Technology', 'Data Science', 'Web Development', 'AI/ML', 'Cybersecurity', 'Cloud Computing', 'Finance/FinTech', 'Healthcare Tech', 'EdTech', 'Other'] %}
+              <option value="{{ opt }}" {% if profile.preferred_industry == opt %}selected{% endif %}>{{ opt }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Preferred Location</label>
+          <input name="preferred_location" class="form-control" placeholder="e.g. Bangalore, Remote, US" value="{{ profile.preferred_location }}" />
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-lg w-100">
+        💾 Save Profile &amp; View Dashboard
+      </button>
+    </form>
+  </div>
+
+  <!-- Profile Preview -->
+  <div>
+    {% if profile.profile_complete %}
+    <div class="card mb-8">
+      <div class="card-header"><h3>👤 Profile Summary</h3></div>
+      <div class="avatar" style="width:64px;height:64px;font-size:24px;margin:0 auto 16px;font-weight:700;background:var(--accent-blue);">
+        {{ profile.full_name[0] if profile.full_name else '?' }}
+      </div>
+      <h2 style="text-align:center;font-size:18px;margin-bottom:4px;">{{ profile.full_name }}</h2>
+      <p style="text-align:center;color:var(--text-muted);font-size:13px;margin-bottom:20px;">{{ profile.degree }} · {{ profile.branch }}</p>
+      <hr class="divider" />
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:13px;">
+        <div><span style="color:var(--text-muted);">Education:</span><br><strong>{{ profile.education }}</strong></div>
+        <div><span style="color:var(--text-muted);">Year:</span><br><strong>{{ profile.year_of_study }}</strong></div>
+        <div><span style="color:var(--text-muted);">CGPA:</span><br><strong>{{ profile.cgpa }}</strong></div>
+        <div><span style="color:var(--text-muted);">Industry:</span><br><strong>{{ profile.preferred_industry }}</strong></div>
+        <div><span style="color:var(--text-muted);">Location:</span><br><strong>{{ profile.preferred_location or 'Not set' }}</strong></div>
+      </div>
+      {% if profile.skills %}
+      <hr class="divider" />
+      <div class="form-label">Skills</div>
+      <div class="tag-list">
+        {% for skill in profile.skills %}<span class="tag has-skill">{{ skill }}</span>{% endfor %}
+      </div>
+      {% endif %}
+      {% if profile.interests %}
+      <hr class="divider" />
+      <div class="form-label">Interests</div>
+      <div class="tag-list">
+        {% for interest in profile.interests %}<span class="tag">{{ interest }}</span>{% endfor %}
+      </div>
+      {% endif %}
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <a href="{{ url_for('dashboard') }}" class="btn btn-primary">📊 View Career Dashboard</a>
+      <a href="{{ url_for('mentor') }}"    class="btn btn-secondary">🤖 Chat with AI Mentor</a>
+      <a href="{{ url_for('roadmap') }}"   class="btn btn-secondary">🗺️ View Learning Roadmap</a>
+    </div>
+    {% else %}
+    <div class="card">
+      <div class="card-header"><h3>🔒 What You'll Unlock</h3></div>
+      <div class="timeline">
+        {% for item in [
+          ('Personalized Career Dashboard', 'Career readiness score, employability metrics, and skill overview.'),
+          ('Skill Gap Analysis', 'Current vs. required skills with a recommended learning path.'),
+          ('Learning Roadmap', 'Custom 3-year plan with technologies, courses, and certifications.'),
+          ('AI Mentor Context', 'Your AI mentor will have your profile context for better advice.'),
+          ('Project Recommendations', 'Projects matched to your skills and career goals.'),
+          ('Career Report PDF', 'Generate and download your complete career development report.')
+        ] %}
+        <div class="timeline-item">
+          <div class="timeline-dot {% if loop.index % 3 == 0 %}purple{% elif loop.index % 3 == 2 %}teal{% endif %}"></div>
+          <div class="timeline-title">{{ item[0] }}</div>
+          <div class="timeline-body">{{ item[1] }}</div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}

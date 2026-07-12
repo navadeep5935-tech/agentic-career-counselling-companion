@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+{% block title %}Projects — Career Companion{% endblock %}
+{% block topbar_title %}Project Recommendation Hub{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div class="breadcrumb"><a href="/">Home</a><span>/</span>Projects</div>
+  <h1>💡 Project Recommendation Hub</h1>
+  <p>Curated projects to build your portfolio and demonstrate real-world skills</p>
+</div>
+
+<div class="tab-nav">
+  <button class="tab-btn active" data-tab="beginner">🟢 Beginner</button>
+  <button class="tab-btn" data-tab="intermediate">🔵 Intermediate</button>
+  <button class="tab-btn" data-tab="advanced">🟣 Advanced</button>
+</div>
+
+<div data-tab-group>
+  <!-- Beginner -->
+  <div id="beginner" class="tab-pane active">
+    <div class="grid grid-auto">
+      {% set beginner_projects = [
+        ("Personal Portfolio Website","Build a responsive portfolio site showcasing your skills and projects.","HTML, CSS, JavaScript","Web Skills, UX Design","⭐⭐⭐⭐"),
+        ("To-Do List App","CRUD application with local storage persistence and clean UI.","JavaScript, HTML/CSS","DOM Manipulation, CRUD","⭐⭐⭐"),
+        ("Weather Dashboard","Fetch and display weather data using a public API.","Python / JavaScript, REST API","API Integration, Data Display","⭐⭐⭐⭐"),
+        ("Student Grade Calculator","Calculate and visualize grades using Python.","Python, Matplotlib","Python Basics, Data Viz","⭐⭐⭐"),
+        ("Quiz Application","Interactive multiple-choice quiz with score tracking.","JavaScript, HTML/CSS","Logic, DOM, UX","⭐⭐⭐"),
+        ("Blog Platform","Simple blog with CRUD operations on posts.","Python Flask, SQLite, HTML","Full Stack Basics, REST","⭐⭐⭐⭐"),
+      ] %}
+      {% for name, desc, tech, skills, value in beginner_projects %}
+      <div class="project-card">
+        <span class="project-level level-beginner">Beginner</span>
+        <h3 style="font-size:15px;font-weight:600;margin-bottom:8px;">{{ name }}</h3>
+        <p style="font-size:13px;color:var(--text-secondary);margin-bottom:14px;">{{ desc }}</p>
+        <hr class="divider" />
+        <div style="font-size:12px;display:flex;flex-direction:column;gap:6px;">
+          <div><span class="text-muted">Technologies: </span>
+            {% for t in tech.split(', ') %}<span class="badge badge-gray">{{ t }}</span> {% endfor %}
+          </div>
+          <div><span class="text-muted">Skills Developed: </span><strong>{{ skills }}</strong></div>
+          <div><span class="text-muted">Portfolio Value: </span>{{ value }}</div>
+        </div>
+        <div class="mt-4">
+          <a href="{{ url_for('mentor') }}" class="btn btn-sm btn-primary">Ask AI for Guide →</a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Intermediate -->
+  <div id="intermediate" class="tab-pane">
+    <div class="grid grid-auto">
+      {% set inter_projects = [
+        ("E-Commerce Platform","Full-stack shopping site with authentication, cart, and payments.","Python Flask, PostgreSQL, Stripe, React","Full Stack, Auth, Payments","⭐⭐⭐⭐⭐"),
+        ("ML House Price Predictor","Predict house prices using regression models and a web UI.","Python, Scikit-learn, Flask, Pandas","ML, Data Science, Web","⭐⭐⭐⭐⭐"),
+        ("Chat Application","Real-time messaging app with rooms and notifications.","Node.js / Flask, Socket.io, React","Real-time, WebSockets","⭐⭐⭐⭐"),
+        ("REST API Backend","Build a fully documented RESTful API with auth and rate limiting.","Python FastAPI / Django, JWT, Swagger","Backend, API Design","⭐⭐⭐⭐⭐"),
+        ("Data Dashboard","Interactive analytics dashboard with filters and charts.","Python, Pandas, Plotly/Dash, SQL","Data Analysis, Viz","⭐⭐⭐⭐⭐"),
+        ("Image Classifier","Train a CNN to classify images using transfer learning.","Python, TensorFlow/PyTorch, FastAPI","Deep Learning, CV, MLOps","⭐⭐⭐⭐⭐"),
+      ] %}
+      {% for name, desc, tech, skills, value in inter_projects %}
+      <div class="project-card">
+        <span class="project-level level-intermediate">Intermediate</span>
+        <h3 style="font-size:15px;font-weight:600;margin-bottom:8px;">{{ name }}</h3>
+        <p style="font-size:13px;color:var(--text-secondary);margin-bottom:14px;">{{ desc }}</p>
+        <hr class="divider" />
+        <div style="font-size:12px;display:flex;flex-direction:column;gap:6px;">
+          <div><span class="text-muted">Technologies: </span>
+            {% for t in tech.split(', ')[:4] %}<span class="badge badge-blue">{{ t }}</span> {% endfor %}
+          </div>
+          <div><span class="text-muted">Skills Developed: </span><strong>{{ skills }}</strong></div>
+          <div><span class="text-muted">Portfolio Value: </span>{{ value }}</div>
+        </div>
+        <div class="mt-4">
+          <a href="{{ url_for('mentor') }}" class="btn btn-sm btn-primary">Ask AI for Guide →</a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Advanced -->
+  <div id="advanced" class="tab-pane">
+    <div class="grid grid-auto">
+      {% set adv_projects = [
+        ("Microservices Platform","Build a distributed system with Docker, Kubernetes, and service mesh.","Docker, Kubernetes, Kafka, Go/Python","DevOps, Distributed Systems","⭐⭐⭐⭐⭐"),
+        ("AI Career Counselor Bot","Build your own domain-specific AI agent using LLM + tools.","Python, LangChain, Vector DB, FastAPI","LLM, Agents, RAG","⭐⭐⭐⭐⭐"),
+        ("Cloud-Native Data Pipeline","End-to-end ETL pipeline on AWS/GCP with monitoring.","AWS/GCP, Apache Spark, Airflow, Terraform","Cloud, Data Eng, IaC","⭐⭐⭐⭐⭐"),
+        ("Cybersecurity Scanner","Automated vulnerability scanner with reporting dashboard.","Python, Nmap, Metasploit, React","Security, Networking, Automation","⭐⭐⭐⭐⭐"),
+        ("Real-Time Fraud Detection","Streaming ML pipeline detecting fraud in transaction data.","Python, Kafka, Spark ML, Redis","ML Ops, Streaming, Real-time","⭐⭐⭐⭐⭐"),
+        ("Personal AI Assistant","Voice-enabled AI assistant with memory, tools, and custom actions.","Python, Whisper, OpenAI API, FastAPI","AI, NLP, System Design","⭐⭐⭐⭐⭐"),
+      ] %}
+      {% for name, desc, tech, skills, value in adv_projects %}
+      <div class="project-card">
+        <span class="project-level level-advanced">Advanced</span>
+        <h3 style="font-size:15px;font-weight:600;margin-bottom:8px;">{{ name }}</h3>
+        <p style="font-size:13px;color:var(--text-secondary);margin-bottom:14px;">{{ desc }}</p>
+        <hr class="divider" />
+        <div style="font-size:12px;display:flex;flex-direction:column;gap:6px;">
+          <div><span class="text-muted">Technologies: </span>
+            {% for t in tech.split(', ')[:4] %}<span class="badge badge-purple">{{ t }}</span> {% endfor %}
+          </div>
+          <div><span class="text-muted">Skills Developed: </span><strong>{{ skills }}</strong></div>
+          <div><span class="text-muted">Portfolio Value: </span>{{ value }}</div>
+        </div>
+        <div class="mt-4">
+          <a href="{{ url_for('mentor') }}" class="btn btn-sm btn-primary">Ask AI for Guide →</a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<!-- AI Projects Banner -->
+<div class="card mt-8" style="background:linear-gradient(135deg,rgba(15,98,254,0.06),rgba(124,58,237,0.06));border:1px solid rgba(15,98,254,0.2);">
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+    <div>
+      <div style="font-size:15px;font-weight:700;margin-bottom:4px;">✨ Get AI-Personalised Project Ideas</div>
+      <div style="font-size:13px;color:var(--text-secondary);">IBM Granite will suggest 6 portfolio projects matched to your specific skills and target industry.</div>
+    </div>
+    <button id="aiProjectBtn" onclick="generateAIProjects()"
+      class="btn btn-primary" style="white-space:nowrap;">✨ Generate with IBM Granite</button>
+  </div>
+</div>
+<div id="aiProjectOutput" style="display:none;margin-top:16px;"></div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+function generateAIProjects() {
+  var btn = document.getElementById('aiProjectBtn');
+  var out = document.getElementById('aiProjectOutput');
+  btn.disabled = true; btn.textContent = '⏳ Generating with IBM Granite…';
+  out.style.display = 'block';
+  out.innerHTML = '<div style="color:var(--text-muted);font-size:13px;padding:16px;text-align:center;">' +
+    '<div style="width:28px;height:28px;border:3px solid #e0e0e0;border-top-color:#0f62fe;border-radius:50%;' +
+    'animation:wxo-spin 0.7s linear infinite;margin:0 auto 10px;"></div>' +
+    'IBM Granite is generating project ideas for you…</div>' +
+    '<style>@keyframes wxo-spin{to{transform:rotate(360deg)}}</style>';
+  fetch('/api/projects-ai',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'})
+  .then(r=>r.json()).then(d=>{
+    if(d.ok){
+      out.innerHTML='<div class="card" style="padding:20px;">' +
+        '<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">' +
+        '<span style="font-size:18px;">🤖</span>' +
+        '<strong style="font-size:14px;color:var(--accent-blue);">AI Project Recommendations — IBM Granite</strong></div>' +
+        '<div style="font-size:13.5px;line-height:1.8;white-space:pre-wrap;color:var(--text-primary);">' +
+        d.result.replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</div></div>';
+    } else {
+      out.innerHTML='<div class="alert alert-warning"><span>⚠️</span><div>'+d.result+'</div></div>';
+    }
+    btn.disabled=false; btn.innerHTML='✨ Regenerate with IBM Granite';
+  }).catch(()=>{
+    out.innerHTML='<div class="alert alert-warning"><span>⚠️</span><div>Could not reach the server.</div></div>';
+    btn.disabled=false; btn.textContent='✨ Generate with IBM Granite';
+  });
+}
+</script>
+{% endblock %}

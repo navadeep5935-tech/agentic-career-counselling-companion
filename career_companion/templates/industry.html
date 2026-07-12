@@ -1,0 +1,267 @@
+{% extends "base.html" %}
+{% block title %}Industry Insights — Career Companion{% endblock %}
+{% block topbar_title %}Industry Insights Center{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div class="breadcrumb"><a href="/">Home</a><span>/</span>Industry Insights</div>
+  <h1>🌐 Industry Insights Center</h1>
+  <p>Stay ahead of the curve — emerging technologies, high-demand skills, and future career growth areas</p>
+</div>
+
+<!-- Trends Chart -->
+<div class="card mb-8">
+  <div class="card-header">
+    <h3>📊 Technology Demand Index 2024–2025</h3>
+    <span class="badge badge-green">Live Trends</span>
+  </div>
+  <div style="height:280px;">
+    <canvas id="trendChart"></canvas>
+  </div>
+</div>
+
+<!-- Quick Stats -->
+<div class="grid grid-4" style="margin-bottom:24px;">
+  <div class="score-card blue">
+    <div class="score-icon blue">🤖</div>
+    <div class="card-title">AI/ML Jobs Growth</div>
+    <div class="card-value">40%</div>
+    <div class="card-subtitle">Year-over-year 2024</div>
+  </div>
+  <div class="score-card teal">
+    <div class="score-icon teal">☁️</div>
+    <div class="card-title">Cloud Roles Open</div>
+    <div class="card-value">2.5M+</div>
+    <div class="card-subtitle">Global shortage</div>
+  </div>
+  <div class="score-card orange">
+    <div class="score-icon orange">🔒</div>
+    <div class="card-title">Cybersecurity Gap</div>
+    <div class="card-value">3.4M</div>
+    <div class="card-subtitle">Unfilled positions</div>
+  </div>
+  <div class="score-card purple">
+    <div class="score-icon purple">📊</div>
+    <div class="card-title">Data Science Salary</div>
+    <div class="card-value">$120K</div>
+    <div class="card-subtitle">US Average 2024</div>
+  </div>
+</div>
+
+<!-- Tabs -->
+<div class="tab-nav">
+  <button class="tab-btn active" data-tab="emerging">🚀 Emerging Tech</button>
+  <button class="tab-btn" data-tab="skills">💪 High-Demand Skills</button>
+  <button class="tab-btn" data-tab="trends">📈 Industry Trends</button>
+  <button class="tab-btn" data-tab="jobs">💼 Future Jobs</button>
+  <button class="tab-btn" data-tab="growth">📊 Growth Areas</button>
+</div>
+
+<div data-tab-group>
+
+  <!-- Emerging Technologies -->
+  <div id="emerging" class="tab-pane active">
+    <div class="grid grid-auto">
+      {% set techs = [
+        ("🤖","Generative AI & LLMs","Foundation models, GPT, Claude, Gemini, RAG, fine-tuning, and AI agents are reshaping every industry.","2024–2027","Explosive Growth","badge-purple"),
+        ("🔮","Edge AI & TinyML","Running AI models on IoT devices, phones, and edge hardware — enabling real-time local intelligence.","2025–2028","Rapid Growth","badge-blue"),
+        ("⚛️","Quantum Computing","Solving complex optimization, cryptography, and simulation problems beyond classical compute limits.","2026–2030","Emerging","badge-teal"),
+        ("🧬","AI in Healthcare","Drug discovery, medical imaging AI, genomics, and personalized medicine powered by machine learning.","2024–2026","High Demand","badge-green"),
+        ("🌐","Web3 & Decentralized Apps","Blockchain, smart contracts, NFTs, DeFi, and decentralized identity are maturing into enterprise tools.","2025–2027","Moderate Growth","badge-orange"),
+        ("🤝","AI Agents & Orchestration","Multi-agent systems, tool-using LLMs, and agentic workflows like IBM watsonx Orchestrate.","2024–2026","Explosive Growth","badge-purple"),
+        ("🔒","Zero Trust Security","Identity-based access, microsegmentation, and continuous verification replacing perimeter security.","2024–2026","High Demand","badge-red"),
+        ("🏭","Industrial AI / MLOps","ML pipelines, model monitoring, data drift detection, and production ML at scale.","2024–2027","Rapid Growth","badge-blue"),
+      ] %}
+      {% for icon, name, desc, timeline, growth, badge in techs %}
+      <div class="feature-card">
+        <div class="feature-icon">{{ icon }}</div>
+        <h3>{{ name }}</h3>
+        <p>{{ desc }}</p>
+        <hr class="divider" />
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <span class="badge badge-gray">{{ timeline }}</span>
+          <span class="badge {{ badge }}">{{ growth }}</span>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- High-Demand Skills -->
+  <div id="skills" class="tab-pane">
+    <div class="grid grid-2">
+      <div class="card">
+        <div class="card-header"><h3>🔥 Most In-Demand Technical Skills</h3></div>
+        {% set tech_skills = [
+          ("Python","90%","Core language for AI/ML, data science, backend, and automation.","blue"),
+          ("Cloud (AWS/GCP/Azure)","88%","Every company is moving to cloud — essential for all engineers.","teal"),
+          ("Machine Learning / AI","85%","Model building, deployment, MLOps, and AI product development.","purple"),
+          ("SQL & Databases","83%","Data querying, analytics, database design — universal requirement.","green"),
+          ("Docker & Kubernetes","80%","Containerization and orchestration for production deployments.","blue"),
+          ("React / Node.js","78%","Full-stack JavaScript for modern web applications.","teal"),
+          ("Cybersecurity","75%","Security engineering, pentesting, compliance — growing rapidly.","red"),
+          ("GenAI / Prompt Engineering","73%","LLM integration, RAG, agents — newest and fastest growing skill.","purple"),
+        ] %}
+        {% for skill, pct, desc, color in tech_skills %}
+        <div class="progress-bar-container" style="margin-bottom:12px;">
+          <div class="progress-label">
+            <span><strong>{{ skill }}</strong></span>
+            <span class="badge badge-{{ color }}">{{ pct }} demand</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill {{ color }}" data-value="{{ pct | replace('%','') }}" style="width:0%"></div></div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">{{ desc }}</div>
+        </div>
+        {% endfor %}
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>🤝 High-Demand Soft Skills</h3></div>
+        {% set soft_skills = [
+          ("Problem Solving","85%","Critical thinking and structured approach to complex challenges.","blue"),
+          ("Communication","83%","Technical writing, presentations, stakeholder management.","green"),
+          ("Collaboration","80%","Remote teamwork, cross-functional projects, code reviews.","teal"),
+          ("Adaptability","78%","Learning new technologies quickly in a rapidly evolving field.","purple"),
+          ("Critical Thinking","75%","Data-driven decision making and analytical mindset.","orange"),
+          ("Leadership","70%","Team leadership, mentoring, owning deliverables end-to-end.","blue"),
+        ] %}
+        {% for skill, pct, desc, color in soft_skills %}
+        <div class="progress-bar-container" style="margin-bottom:12px;">
+          <div class="progress-label">
+            <span><strong>{{ skill }}</strong></span>
+            <span class="badge badge-{{ color }}">{{ pct }}</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill {{ color }}" data-value="{{ pct | replace('%','') }}" style="width:0%"></div></div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">{{ desc }}</div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Industry Trends -->
+  <div id="trends" class="tab-pane">
+    <div class="grid grid-2">
+      <div class="card">
+        <div class="card-header"><h3>📈 Major Industry Trends 2024–2025</h3></div>
+        <div class="timeline">
+          {% set trends = [
+            ("AI-First Companies","Every major enterprise is embedding AI into core products — creating massive demand for AI-literate engineers."),
+            ("Remote & Hybrid Work","70% of tech jobs now offer remote options, opening global opportunities for skilled developers."),
+            ("Platform Engineering","Internal developer platforms, GitOps, and self-service infrastructure are the future of DevOps."),
+            ("Data Mesh Architecture","Decentralized data ownership and domain-driven data products replacing monolithic data lakes."),
+            ("Green Tech & Sustainability","Sustainable software engineering, energy-efficient ML, and green cloud computing are rising priorities."),
+            ("AI Regulation & Ethics","Growing demand for AI safety engineers, ethicists, and compliance professionals."),
+          ] %}
+          {% for title, body in trends %}
+          <div class="timeline-item">
+            <div class="timeline-dot {% if loop.index % 3 == 0 %}purple{% elif loop.index % 3 == 2 %}teal{% endif %}"></div>
+            <div class="timeline-title">{{ title }}</div>
+            <div class="timeline-body">{{ body }}</div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>🏢 Top Hiring Industries</h3></div>
+        {% set industries = [
+          ("Artificial Intelligence / ML", 95, "purple"),
+          ("Cloud Computing", 90, "blue"),
+          ("Cybersecurity", 88, "red"),
+          ("FinTech / Banking Tech", 85, "green"),
+          ("Healthcare Technology", 82, "teal"),
+          ("E-Commerce / Retail Tech", 78, "orange"),
+          ("EdTech / HRTech", 72, "blue"),
+          ("Government / Defense Tech", 68, "teal"),
+        ] %}
+        {% for industry, val, color in industries %}
+        <div class="progress-bar-container">
+          <div class="progress-label"><span>{{ industry }}</span><span>{{ val }}/100</span></div>
+          <div class="progress-bar"><div class="progress-fill {{ color }}" data-value="{{ val }}" style="width:0%"></div></div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Future Jobs -->
+  <div id="jobs" class="tab-pane">
+    <div class="grid grid-auto">
+      {% set future_jobs = [
+        ("AI Engineer","Design, build, and deploy AI systems and LLM-powered products.","$130K–$200K","High","🤖","badge-purple"),
+        ("MLOps Engineer","Build and maintain ML infrastructure, pipelines, and model monitoring.","$120K–$180K","High","⚙️","badge-blue"),
+        ("Cloud Architect","Design scalable, secure, and cost-efficient cloud infrastructure.","$140K–$220K","Very High","☁️","badge-teal"),
+        ("Data Engineer","Build data pipelines, warehouses, and real-time streaming systems.","$110K–$170K","High","📊","badge-green"),
+        ("Cybersecurity Engineer","Protect systems, respond to threats, and build security automation.","$115K–$175K","Very High","🔒","badge-red"),
+        ("Full Stack Engineer","Build end-to-end web and mobile applications with modern frameworks.","$100K–$160K","High","💻","badge-blue"),
+        ("Product Manager (Tech)","Define product vision, roadmap, and bridge engineering and business.","$120K–$200K","High","📋","badge-orange"),
+        ("AI Ethics & Governance Specialist","Ensure responsible and unbiased AI systems across the enterprise.","$90K–$140K","Growing","⚖️","badge-purple"),
+      ] %}
+      {% for role, desc, salary, demand, icon, badge in future_jobs %}
+      <div class="feature-card">
+        <div class="feature-icon">{{ icon }}</div>
+        <h3>{{ role }}</h3>
+        <p>{{ desc }}</p>
+        <hr class="divider" />
+        <div style="font-size:12px;display:flex;gap:6px;flex-wrap:wrap;">
+          <span class="badge badge-gray">{{ salary }}</span>
+          <span class="badge {{ badge }}">Demand: {{ demand }}</span>
+        </div>
+        <div class="mt-4">
+          <a href="{{ url_for('mentor') }}" class="btn btn-sm btn-outline">Explore Path →</a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Growth Areas -->
+  <div id="growth" class="tab-pane">
+    <div class="grid grid-2">
+      <div class="card">
+        <div class="card-header"><h3>🚀 Fastest Growing Career Areas</h3></div>
+        {% set growth_areas = [
+          ("Generative AI & LLM Engineering","40% YoY","Applications, fine-tuning, RAG, agents","purple"),
+          ("Cloud Security","35% YoY","Zero trust, cloud-native security tooling","red"),
+          ("Platform Engineering","30% YoY","Internal developer portals, GitOps, IaC","blue"),
+          ("Data Mesh & Lakehouse","28% YoY","Modern data architecture and governance","teal"),
+          ("AI-Powered Product Development","25% YoY","Embedding AI into consumer and enterprise products","purple"),
+          ("Quantum-Safe Cryptography","22% YoY","Post-quantum algorithms and security migration","orange"),
+        ] %}
+        {% for area, growth, desc, color in growth_areas %}
+        <div style="padding:12px 0;border-bottom:1px solid var(--border-color);">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+            <strong style="font-size:13.5px;">{{ area }}</strong>
+            <span class="badge badge-{{ color }}">{{ growth }}</span>
+          </div>
+          <div style="font-size:12px;color:var(--text-muted);">{{ desc }}</div>
+        </div>
+        {% endfor %}
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>🌍 Global Tech Hubs for Students</h3></div>
+        {% set hubs = [
+          ("Bangalore, India","🇮🇳","Silicon Valley of Asia — IBM, Google, Microsoft, Infosys, Wipro HQs"),
+          ("San Francisco / Bay Area","🇺🇸","World's largest tech ecosystem — FAANG, OpenAI, Anthropic"),
+          ("London, UK","🇬🇧","Europe's FinTech and AI capital — DeepMind, ARM, Revolut"),
+          ("Singapore","🇸🇬","Asia-Pacific's financial and AI technology hub"),
+          ("Toronto / Montreal","🇨🇦","Growing AI research ecosystem — Element AI, Vector Institute"),
+          ("Berlin, Germany","🇩🇪","Europe's startup hub — N26, Zalando, Delivery Hero"),
+          ("Remote / Global","🌐","Remote-first tech companies hiring talent worldwide"),
+        ] %}
+        {% for city, flag, desc in hubs %}
+        <div style="display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--border-color);font-size:13.5px;">
+          <span style="font-size:18px;flex-shrink:0;">{{ flag }}</span>
+          <div><strong>{{ city }}</strong><div style="font-size:12px;color:var(--text-secondary);">{{ desc }}</div></div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="alert alert-info mt-8">
+  <span>🤖</span>
+  <div><strong>Get AI-powered industry insights personalized to your profile.</strong> Ask the <a href="{{ url_for('mentor') }}">AI Career Mentor</a>: <em>"What are the top emerging roles in {{ profile.preferred_industry or 'technology' }} for 2025?"</em></div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,231 @@
+{% extends "base.html" %}
+{% block title %}Learning Roadmap — Career Companion{% endblock %}
+{% block topbar_title %}Learning Roadmap{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div class="breadcrumb"><a href="/">Home</a><span>/</span>Learning Roadmap</div>
+  <h1>🗺️ Personalized Learning Roadmap</h1>
+  <p>Your structured career development plan — short, medium, and long term</p>
+</div>
+
+{% if profile.preferred_industry %}
+<div class="alert alert-info mb-8">
+  <span>🎯</span>
+  <div>Roadmap customized for: <strong>{{ profile.preferred_industry }}</strong> · Goal: <strong>{{ profile.career_goals or 'Software Engineer' }}</strong></div>
+</div>
+{% endif %}
+
+<!-- Short Term -->
+<div class="roadmap-section">
+  <div class="roadmap-header">
+    <span class="roadmap-badge short">Short Term</span>
+    <h3 style="font-size:16px;font-weight:600;">{{ roadmap.short_term.label }} — Foundation Building</h3>
+    <span class="badge badge-green" style="margin-left:auto;">Start Now</span>
+  </div>
+  <div class="roadmap-body">
+    <div class="roadmap-cols">
+      <div>
+        <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);margin-bottom:10px;">💻 Technologies</div>
+        {% for tech in roadmap.short_term.technologies %}
+        <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border-color);font-size:13.5px;">
+          <span style="color:var(--accent-green);">▸</span>{{ tech }}
+        </div>
+        {% endfor %}
+      </div>
+      <div>
+        <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);margin-bottom:10px;">📚 Courses</div>
+        {% for course in roadmap.short_term.courses %}
+        <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border-color);font-size:13.5px;">
+          <span style="color:var(--accent-blue);">▸</span>{{ course }}
+        </div>
+        {% endfor %}
+      </div>
+      <div>
+        <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);margin-bottom:10px;">🎯 Milestones</div>
+        {% for m in roadmap.short_term.milestones %}
+        <div style="display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-bottom:1px solid var(--border-color);font-size:13.5px;">
+          <span style="color:var(--accent-teal);flex-shrink:0;">✓</span>{{ m }}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    <hr class="divider" />
+    <div>
+      <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);margin-bottom:10px;">🏆 Certifications</div>
+      <div class="tag-list">
+        {% for cert in roadmap.short_term.certifications %}
+        <span class="badge badge-green">{{ cert }}</span>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Medium Term -->
+<div class="roadmap-section">
+  <div class="roadmap-header">
+    <span class="roadmap-badge medium">Medium Term</span>
+    <h3 style="font-size:16px;font-weight:600;">{{ roadmap.medium_term.label }} — Specialization</h3>
+    <span class="badge badge-blue" style="margin-left:auto;">Up Next</span>
+  </div>
+  <div class="roadmap-body">
+    <div class="roadmap-cols">
+      <div>
+        <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);margin-bottom:10px;">💻 Technologies</div>
+        {% for tech in roadmap.medium_term.technologies %}
+        <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border-color);font-size:13.5px;">
+          <span style="color:var(--accent-blue);">▸</span>{{ tech }}
+        </div>
+        {% endfor %}
+      </div>
+      <div>
+        <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);margin-bottom:10px;">📚 Courses</div>
+        {% for course in roadmap.medium_term.courses %}
+        <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border-color);font-size:13.5px;">
+          <span style="color:var(--accent-blue);">▸</span>{{ course }}
+        </div>
+        {% endfor %}
+      </div>
+      <div>
+        <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);margin-bottom:10px;">🎯 Milestones</div>
+        {% for m in roadmap.medium_term.milestones %}
+        <div style="display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-bottom:1px solid var(--border-color);font-size:13.5px;">
+          <span style="color:var(--accent-blue);flex-shrink:0;">✓</span>{{ m }}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    <hr class="divider" />
+    <div>
+      <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);margin-bottom:10px;">🏆 Certifications</div>
+      <div class="tag-list">
+        {% for cert in roadmap.medium_term.certifications %}
+        <span class="badge badge-blue">{{ cert }}</span>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Long Term -->
+<div class="roadmap-section">
+  <div class="roadmap-header">
+    <span class="roadmap-badge long">Long Term</span>
+    <h3 style="font-size:16px;font-weight:600;">{{ roadmap.long_term.label }} — Career Mastery</h3>
+    <span class="badge badge-purple" style="margin-left:auto;">Future</span>
+  </div>
+  <div class="roadmap-body">
+    <div class="roadmap-cols">
+      <div>
+        <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);margin-bottom:10px;">💻 Technologies</div>
+        {% for tech in roadmap.long_term.technologies %}
+        <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border-color);font-size:13.5px;">
+          <span style="color:var(--accent-purple);">▸</span>{{ tech }}
+        </div>
+        {% endfor %}
+      </div>
+      <div>
+        <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);margin-bottom:10px;">📚 Courses</div>
+        {% for course in roadmap.long_term.courses %}
+        <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border-color);font-size:13.5px;">
+          <span style="color:var(--accent-purple);">▸</span>{{ course }}
+        </div>
+        {% endfor %}
+      </div>
+      <div>
+        <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);margin-bottom:10px;">🎯 Milestones</div>
+        {% for m in roadmap.long_term.milestones %}
+        <div style="display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-bottom:1px solid var(--border-color);font-size:13.5px;">
+          <span style="color:var(--accent-purple);flex-shrink:0;">✓</span>{{ m }}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    <hr class="divider" />
+    <div>
+      <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);margin-bottom:10px;">🏆 Certifications</div>
+      <div class="tag-list">
+        {% for cert in roadmap.long_term.certifications %}
+        <span class="badge badge-purple">{{ cert }}</span>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- AI Generate Banner -->
+{% if profile.profile_complete %}
+<div class="card mb-8" style="background:linear-gradient(135deg,rgba(15,98,254,0.06),rgba(124,58,237,0.06));border:1px solid rgba(15,98,254,0.2);">
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+    <div>
+      <div style="font-size:15px;font-weight:700;margin-bottom:4px;">✨ Generate Your AI-Personalised Roadmap</div>
+      <div style="font-size:13px;color:var(--text-secondary);">IBM Granite will generate a custom roadmap based on your exact skills, goals and target industry.</div>
+    </div>
+    <button id="aiRoadmapBtn" onclick="generateAIRoadmap()"
+      class="btn btn-primary" style="white-space:nowrap;">✨ Generate with IBM Granite</button>
+  </div>
+</div>
+<div id="aiRoadmapOutput" style="display:none;margin-bottom:24px;"></div>
+{% endif %}
+
+<!-- CTA Row -->
+<div class="grid grid-3 mt-8">
+  <div class="card text-center" style="padding:24px;">
+    <div style="font-size:32px;margin-bottom:8px;">🤖</div>
+    <h4 style="margin-bottom:8px;">Customize Roadmap</h4>
+    <p style="font-size:13px;color:var(--text-secondary);margin-bottom:14px;">Ask the AI mentor to create a roadmap tailored to your specific goal.</p>
+    <a href="{{ url_for('mentor') }}" class="btn btn-primary btn-sm">Ask AI Mentor</a>
+  </div>
+  <div class="card text-center" style="padding:24px;">
+    <div style="font-size:32px;margin-bottom:8px;">🏆</div>
+    <h4 style="margin-bottom:8px;">Certifications</h4>
+    <p style="font-size:13px;color:var(--text-secondary);margin-bottom:14px;">Explore all certifications from IBM, AWS, Google, and Microsoft.</p>
+    <a href="{{ url_for('certifications') }}" class="btn btn-secondary btn-sm">View Certifications</a>
+  </div>
+  <div class="card text-center" style="padding:24px;">
+    <div style="font-size:32px;margin-bottom:8px;">📄</div>
+    <h4 style="margin-bottom:8px;">Download Plan</h4>
+    <p style="font-size:13px;color:var(--text-secondary);margin-bottom:14px;">Generate and export your complete career development plan.</p>
+    <a href="{{ url_for('reports') }}" class="btn btn-secondary btn-sm">Career Reports</a>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+/* ── AI-Generate Roadmap using IBM Granite ── */
+function generateAIRoadmap() {
+  var btn = document.getElementById('aiRoadmapBtn');
+  var out = document.getElementById('aiRoadmapOutput');
+  btn.disabled = true;
+  btn.textContent = '⏳ Generating with IBM Granite…';
+  out.style.display = 'block';
+  out.innerHTML = '<div style="color:var(--text-muted);font-size:13px;padding:16px;text-align:center;">' +
+    '<div style="width:28px;height:28px;border:3px solid #e0e0e0;border-top-color:#0f62fe;border-radius:50%;' +
+    'animation:wxo-spin 0.7s linear infinite;margin:0 auto 10px;"></div>' +
+    'IBM Granite is generating your personalised roadmap…</div>' +
+    '<style>@keyframes wxo-spin{to{transform:rotate(360deg)}}</style>';
+  fetch('/api/generate-roadmap', { method: 'POST',
+    headers: { 'Content-Type': 'application/json' }, body: '{}' })
+  .then(r => r.json()).then(d => {
+    if (d.ok) {
+      out.innerHTML = '<div class="card" style="padding:20px;margin-top:0;">' +
+        '<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">' +
+        '<span style="font-size:18px;">🤖</span>' +
+        '<strong style="font-size:14px;color:var(--accent-blue);">AI-Generated Roadmap — IBM Granite</strong></div>' +
+        '<div style="font-size:13.5px;line-height:1.8;white-space:pre-wrap;color:var(--text-primary);">' +
+        d.result.replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</div></div>';
+    } else {
+      out.innerHTML = '<div class="alert alert-warning"><span>⚠️</span><div>' + d.result + '</div></div>';
+    }
+    btn.disabled = false;
+    btn.innerHTML = '✨ Regenerate with IBM Granite';
+  }).catch(() => {
+    out.innerHTML = '<div class="alert alert-warning"><span>⚠️</span><div>Could not reach the server.</div></div>';
+    btn.disabled = false; btn.textContent = '✨ Generate AI Roadmap';
+  });
+}
+</script>
+{% endblock %}

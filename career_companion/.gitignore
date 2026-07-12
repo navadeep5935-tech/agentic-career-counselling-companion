@@ -1,0 +1,36 @@
+﻿# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+.Python
+
+# Virtual environment
+venv/
+env/
+ENV/
+.venv/
+
+# Environment variables — API keys, never commit
+.env
+.env.local
+
+# Flask
+instance/
+flask_session/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Test files
+test_wx.py

@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% block title %}About — Agentic Career Counseling Companion{% endblock %}
+{% block topbar_title %}About{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div class="breadcrumb"><a href="/">Home</a><span>/</span>About</div>
+  <h1>About This Platform</h1>
+  <p>Understand the mission, technology, and team behind the Career Counseling Companion</p>
+</div>
+
+<!-- Problem Statement -->
+<div class="card mb-8">
+  <div class="card-header"><h3>🎯 Problem Statement</h3></div>
+  <p style="color:var(--text-secondary);line-height:1.8;">
+    Students today face fragmented career guidance, limited self-awareness of academic strengths, rapidly changing technologies,
+    and evolving industry demands. Traditional career counseling is neither personalized, scalable, nor continuously updated.
+    Many students graduate without a clear direction — missing critical skills and opportunities simply because they didn't know where to look.
+  </p>
+</div>
+
+<!-- Solution -->
+<div class="card mb-8">
+  <div class="card-header"><h3>💡 Our Solution</h3></div>
+  <div class="grid grid-2">
+    <div>
+      <p style="color:var(--text-secondary);line-height:1.8;margin-bottom:16px;">
+        The <strong>Agentic Career Counseling Companion</strong> is an AI-powered platform built on IBM watsonx Orchestrate that provides
+        personalized, scalable, and always-updated career guidance to every student — regardless of background or institution.
+      </p>
+      <p style="color:var(--text-secondary);line-height:1.8;">
+        The platform combines an intelligent AI mentor with structured career tools: skill gap analysis, learning roadmaps,
+        project recommendations, certification guidance, and industry insights — all in one unified interface.
+      </p>
+    </div>
+    <div>
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-title">Student Creates Profile</div>
+          <div class="timeline-body">Academic details, skills, goals, and preferences are captured.</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot teal"></div>
+          <div class="timeline-title">AI Analyzes &amp; Recommends</div>
+          <div class="timeline-body">watsonx Orchestrate generates personalized insights and roadmaps.</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot purple"></div>
+          <div class="timeline-title">Student Learns &amp; Builds</div>
+          <div class="timeline-body">Follows structured roadmap, completes projects, earns certifications.</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-title">Career Goals Achieved</div>
+          <div class="timeline-body">Lands internship, builds portfolio, secures first role in target industry.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Technology Stack -->
+<div class="page-header mt-8"><h1>Technology Stack</h1></div>
+<div class="grid grid-3 mb-8">
+  <div class="card text-center" style="padding:28px 20px;">
+    <div style="font-size:36px;margin-bottom:10px;">🤖</div>
+    <h3 style="font-size:15px;font-weight:600;margin-bottom:8px;">IBM watsonx Orchestrate</h3>
+    <p style="font-size:13px;color:var(--text-secondary);">Agentic AI engine providing personalized career counseling, skill assessment, and career path recommendations.</p>
+    <span class="badge badge-blue mt-4">Core AI Engine</span>
+  </div>
+  <div class="card text-center" style="padding:28px 20px;">
+    <div style="font-size:36px;margin-bottom:10px;">🐍</div>
+    <h3 style="font-size:15px;font-weight:600;margin-bottom:8px;">Python Flask</h3>
+    <p style="font-size:13px;color:var(--text-secondary);">Lightweight web framework powering the backend API, routing, session management, and template rendering.</p>
+    <span class="badge badge-green mt-4">Backend</span>
+  </div>
+  <div class="card text-center" style="padding:28px 20px;">
+    <div style="font-size:36px;margin-bottom:10px;">🎨</div>
+    <h3 style="font-size:15px;font-weight:600;margin-bottom:8px;">HTML5 / CSS3 / JS</h3>
+    <p style="font-size:13px;color:var(--text-secondary);">Responsive frontend with IBM-inspired design system, dark mode, Chart.js visualizations, and smooth UX interactions.</p>
+    <span class="badge badge-purple mt-4">Frontend</span>
+  </div>
+</div>
+
+<!-- Core Features -->
+<div class="page-header mt-8"><h1>Core Platform Features</h1></div>
+<div class="grid grid-2 mb-8">
+  {% set features = [
+    ("📊","Career Intelligence Dashboard","Visual analytics showing career readiness, employability scores, skills overview, and growth timelines."),
+    ("🤖","AI Career Mentor","IBM watsonx Orchestrate embedded agent for real-time personalized career counseling."),
+    ("🎯","Skill Gap Analysis","Side-by-side comparison of current vs. required skills with recommended learning paths."),
+    ("🗺️","Learning Roadmap","Structured 0–3 month, 3–12 month, and 1–3 year development plans."),
+    ("💡","Project Hub","Curated projects by difficulty level that build real portfolio value."),
+    ("🏆","Certification Center","Categorized certifications from IBM, AWS, Google, Microsoft, and more."),
+    ("🏢","Internship Center","Application strategies, interview prep, and resume guidance."),
+    ("🌐","Industry Insights","Live industry trends, emerging technologies, and future career opportunities.")
+  ] %}
+  {% for icon, title, desc in features %}
+  <div class="card" style="display:flex;gap:14px;align-items:flex-start;">
+    <div style="font-size:26px;flex-shrink:0;">{{ icon }}</div>
+    <div>
+      <h4 style="font-size:14px;font-weight:600;margin-bottom:4px;">{{ title }}</h4>
+      <p style="font-size:13px;color:var(--text-secondary);">{{ desc }}</p>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<div class="alert alert-info">
+  <span>ℹ️</span>
+  <div>This platform was built for the <strong>IBM watsonx Orchestrate Hackathon</strong>. The AI Career Counseling Agent has been deployed in IBM watsonx Orchestrate and is embedded as the core intelligence engine of this system.</div>
+</div>
+
+{% endblock %}

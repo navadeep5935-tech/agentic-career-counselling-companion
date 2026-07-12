@@ -1,0 +1,665 @@
+{% extends "base.html" %}
+{% block title %}AI Career Mentor — Career Companion{% endblock %}
+{% block topbar_title %}AI Career Mentor{% endblock %}
+
+{% block head %}
+<style>
+  /* ── Page layout: remove padding, full height ── */
+  .page-content {
+    padding: 0 !important;
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 60px);
+    overflow: hidden;
+  }
+
+  .mentor-layout {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  /* ════════════════════════════════
+     LEFT — Chat panel
+  ════════════════════════════════ */
+  .chat-panel {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+    background: var(--bg-card);
+    border-right: 1px solid var(--border-color);
+  }
+
+  /* Gradient header */
+  .chat-header {
+    background: linear-gradient(135deg, #0f62fe 0%, #7c3aed 100%);
+    padding: 12px 20px;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+  .chat-header-icon {
+    width: 36px; height: 36px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; flex-shrink: 0;
+  }
+  .model-badge {
+    margin-left: auto;
+    background: rgba(255,255,255,0.2);
+    color: #fff;
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-weight: 600;
+    border: 1px solid rgba(255,255,255,0.3);
+  }
+
+  /* ── Messages area ── */
+  .chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-height: 0;
+  }
+  .chat-messages::-webkit-scrollbar { width: 4px; }
+  .chat-messages::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 2px; }
+
+  /* Message bubbles */
+  .msg {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    max-width: 88%;
+    animation: msgIn 0.2s ease;
+  }
+  @keyframes msgIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
+
+  .msg.user  { align-self: flex-end; flex-direction: row-reverse; }
+  .msg.bot   { align-self: flex-start; }
+  .msg.error { align-self: flex-start; }
+
+  .msg-avatar {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; flex-shrink: 0;
+  }
+  .msg.user  .msg-avatar { background: #0f62fe; color: #fff; font-size: 13px; font-weight: 700; }
+  .msg.bot   .msg-avatar { background: linear-gradient(135deg,#0f62fe,#7c3aed); color:#fff; }
+  .msg.error .msg-avatar { background: #da1e28; color: #fff; }
+
+  .msg-bubble {
+    padding: 11px 15px;
+    border-radius: 12px;
+    font-size: 13.5px;
+    line-height: 1.65;
+    word-break: break-word;
+  }
+  .msg.user  .msg-bubble {
+    background: #0f62fe;
+    color: #fff;
+    border-bottom-right-radius: 3px;
+  }
+  .msg.bot   .msg-bubble {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-bottom-left-radius: 3px;
+  }
+  .msg.error .msg-bubble {
+    background: rgba(218,30,40,0.08);
+    color: #da1e28;
+    border: 1px solid rgba(218,30,40,0.2);
+    border-bottom-left-radius: 3px;
+  }
+
+  /* Markdown-like formatting inside bot bubbles */
+  .msg-bubble strong { font-weight: 700; }
+  .msg-bubble ul, .msg-bubble ol {
+    margin: 6px 0 6px 18px;
+    padding: 0;
+  }
+  .msg-bubble li { margin-bottom: 3px; }
+  .msg-bubble p  { margin: 0 0 6px 0; }
+  .msg-bubble p:last-child { margin-bottom: 0; }
+  .msg-bubble code {
+    background: rgba(0,0,0,0.08);
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 12px;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  /* Typing indicator */
+  .typing-bubble {
+    display: flex; align-items: center; gap: 4px;
+    padding: 12px 16px;
+  }
+  .typing-bubble span {
+    width: 7px; height: 7px;
+    background: var(--text-muted);
+    border-radius: 50%;
+    animation: bounce 1.2s infinite;
+  }
+  .typing-bubble span:nth-child(2) { animation-delay: 0.2s; }
+  .typing-bubble span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bounce {
+    0%,60%,100% { transform: translateY(0); }
+    30%          { transform: translateY(-6px); }
+  }
+
+  /* ── Input area ── */
+  .chat-input-area {
+    padding: 14px 16px;
+    border-top: 1px solid var(--border-color);
+    background: var(--bg-card);
+    flex-shrink: 0;
+  }
+  .chat-input-row {
+    display: flex;
+    gap: 8px;
+    align-items: flex-end;
+  }
+  #chatInput {
+    flex: 1;
+    resize: none;
+    padding: 10px 14px;
+    font-size: 14px;
+    border: 1.5px solid var(--border-color);
+    border-radius: 10px;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    font-family: inherit;
+    line-height: 1.5;
+    max-height: 120px;
+    overflow-y: auto;
+    transition: border-color 0.15s;
+    outline: none;
+  }
+  #chatInput:focus { border-color: #0f62fe; background: var(--bg-card); }
+  #chatInput::placeholder { color: var(--text-muted); }
+  #sendBtn {
+    width: 42px; height: 42px;
+    border-radius: 10px;
+    background: #0f62fe;
+    border: none;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+    transition: background 0.15s, transform 0.1s;
+  }
+  #sendBtn:hover   { background: #0353e9; }
+  #sendBtn:active  { transform: scale(0.95); }
+  #sendBtn:disabled { background: var(--border-color); cursor: not-allowed; }
+
+  .input-hint {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* Welcome message */
+  .welcome-card {
+    background: linear-gradient(135deg, rgba(15,98,254,0.06) 0%, rgba(124,58,237,0.06) 100%);
+    border: 1px solid rgba(15,98,254,0.15);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    margin: 8px 0;
+  }
+  .welcome-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+  .welcome-card p  { font-size: 13px; color: var(--text-secondary); margin-bottom: 14px; }
+
+  /* Quick-start chips inside welcome */
+  .chip-grid {
+    display: flex; flex-wrap: wrap; gap: 6px; justify-content: center;
+  }
+  .chip {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 5px 12px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+    color: var(--text-primary);
+    font-family: inherit;
+  }
+  .chip:hover { border-color: #0f62fe; color: #0f62fe; background: rgba(15,98,254,0.05); }
+
+  /* ════════════════════════════════
+     RIGHT — Sidebar
+  ════════════════════════════════ */
+  .mentor-sidebar {
+    overflow-y: auto;
+    padding: 14px;
+    background: var(--bg-secondary);
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .mentor-sidebar::-webkit-scrollbar { width: 4px; }
+  .mentor-sidebar::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 2px; }
+
+  .s-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 12px;
+  }
+  .s-title {
+    font-size: 12px; font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+  }
+
+  .sq {
+    width: 100%;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 7px 10px;
+    margin-bottom: 4px;
+    text-align: left;
+    cursor: pointer;
+    font-size: 11.5px;
+    color: var(--text-primary);
+    display: flex; align-items: flex-start; gap: 6px;
+    transition: all 0.15s;
+    font-family: inherit;
+    line-height: 1.4;
+  }
+  .sq:hover { border-color: #0f62fe; background: rgba(15,98,254,0.05); color: #0f62fe; }
+
+  /* Responsive */
+  @media (max-width: 860px) {
+    .mentor-layout { grid-template-columns: 1fr; grid-template-rows: 62vh auto; }
+    .mentor-sidebar { max-height: 36vh; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="mentor-layout">
+
+  <!-- ════════════════════════════════════════
+       LEFT — Granite Chat Interface
+  ════════════════════════════════════════ -->
+  <div class="chat-panel">
+
+    <!-- Header -->
+    <div class="chat-header">
+      <div class="chat-header-icon">🤖</div>
+      <div>
+        <div style="font-weight:700;font-size:13.5px;line-height:1.2;">AI Career Mentor</div>
+        <div style="font-size:11px;opacity:0.8;">Powered by IBM Granite · watsonx.ai</div>
+      </div>
+      <span class="model-badge">🟢 granite-13b-chat</span>
+    </div>
+
+    <!-- Messages -->
+    <div class="chat-messages" id="chatMessages">
+
+      <!-- Welcome card -->
+      <div class="welcome-card" id="welcomeCard">
+        <div style="font-size:32px;margin-bottom:8px;">🎓</div>
+        <h3>Your AI Career Mentor is Ready</h3>
+        <p>
+          Powered by <strong>IBM Granite</strong> on watsonx.ai.<br>
+          Ask me anything about careers, skills, certifications, interviews, and more.
+        </p>
+        <div class="chip-grid">
+          {% for q in [
+            "Which career suits me?",
+            "What should I learn next?",
+            "Best certifications for me?",
+            "How to get an internship?",
+            "Projects for my portfolio?",
+            "How to crack tech interviews?"
+          ] %}
+          <button class="chip" onclick="sendChip('{{ q }}')">{{ q }}</button>
+          {% endfor %}
+        </div>
+        {% if profile.profile_complete %}
+        <div style="margin-top:12px;font-size:12px;color:var(--text-muted);">
+          ✅ Profile loaded — advice will be personalised for <strong>{{ profile.full_name }}</strong>
+        </div>
+        {% else %}
+        <div style="margin-top:12px;font-size:12px;color:#ff832b;">
+          ⚠️ <a href="{{ url_for('profile') }}" style="color:#ff832b;">Complete your profile</a> for personalised advice
+        </div>
+        {% endif %}
+      </div>
+
+    </div><!-- /chat-messages -->
+
+    <!-- Input -->
+    <div class="chat-input-area">
+      <div class="chat-input-row">
+        <textarea
+          id="chatInput"
+          placeholder="Ask me about careers, skills, certifications, internships…"
+          rows="1"
+        ></textarea>
+        <button id="sendBtn" onclick="sendMessage()" title="Send (Enter)">➤</button>
+      </div>
+      <div class="input-hint">
+        <span>⌨️</span>
+        <span>Press <kbd style="background:var(--bg-secondary);border:1px solid var(--border-color);padding:0 4px;border-radius:3px;font-size:10px;">Enter</kbd> to send &nbsp;·&nbsp;
+        <kbd style="background:var(--bg-secondary);border:1px solid var(--border-color);padding:0 4px;border-radius:3px;font-size:10px;">Shift+Enter</kbd> for new line</span>
+        <span style="margin-left:auto;color:#0f62fe;font-weight:500;">IBM Granite ✦ watsonx.ai</span>
+      </div>
+    </div>
+
+  </div><!-- /chat-panel -->
+
+  <!-- ════════════════════════════════════════
+       RIGHT — Sidebar
+  ════════════════════════════════════════ -->
+  <div class="mentor-sidebar">
+
+    <!-- Profile context -->
+    {% if profile.profile_complete %}
+    <div class="s-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+        <span class="s-title" style="margin:0;">👤 Profile</span>
+        <span style="background:rgba(36,161,72,0.1);color:#24a148;border-radius:20px;
+                     padding:2px 7px;font-size:10px;font-weight:600;">Loaded</span>
+      </div>
+      <div style="font-size:11.5px;color:var(--text-secondary);display:flex;flex-direction:column;gap:3px;">
+        <div style="display:flex;justify-content:space-between;">
+          <span>Name</span><strong style="color:var(--text-primary);">{{ profile.full_name }}</strong>
+        </div>
+        <div style="display:flex;justify-content:space-between;">
+          <span>Branch</span><strong style="color:var(--text-primary);">{{ profile.branch or '—' }}</strong>
+        </div>
+        <div style="display:flex;justify-content:space-between;">
+          <span>CGPA</span><strong style="color:var(--text-primary);">{{ profile.cgpa or '—' }}</strong>
+        </div>
+        <div style="display:flex;justify-content:space-between;">
+          <span>Target</span><strong style="color:var(--text-primary);">{{ profile.preferred_industry or '—' }}</strong>
+        </div>
+      </div>
+      {% if profile.skills %}
+      <div style="margin-top:7px;display:flex;flex-wrap:wrap;gap:3px;">
+        {% for s in profile.skills[:5] %}
+        <span style="background:rgba(36,161,72,0.08);color:#24a148;border-radius:20px;
+                     padding:2px 7px;font-size:10px;font-weight:500;">{{ s }}</span>
+        {% endfor %}
+        {% if profile.skills|length > 5 %}
+        <span style="background:var(--bg-secondary);color:var(--text-muted);border-radius:20px;
+                     padding:2px 6px;font-size:10px;">+{{ profile.skills|length - 5 }}</span>
+        {% endif %}
+      </div>
+      {% endif %}
+      <a href="{{ url_for('profile') }}" class="btn btn-sm btn-secondary"
+         style="width:100%;justify-content:center;margin-top:8px;font-size:11px;">Edit Profile</a>
+    </div>
+    {% else %}
+    <div class="s-card">
+      <div class="s-title">💡 Get Personalised Advice</div>
+      <p style="font-size:11.5px;color:var(--text-secondary);margin-bottom:10px;line-height:1.5;">
+        Complete your profile so Granite gives career advice specific to <em>your</em> skills and goals.
+      </p>
+      <a href="{{ url_for('profile') }}" class="btn btn-primary btn-sm"
+         style="width:100%;justify-content:center;font-size:11px;">Create Profile →</a>
+    </div>
+    {% endif %}
+
+    <!-- Starter questions -->
+    <div class="s-card">
+      <div class="s-title">💬 Quick Questions</div>
+      {% for icon, q in [
+        ("🎯", "Which career path suits my profile best?"),
+        ("📚", "What skills should I learn next to get job-ready?"),
+        ("🏆", "Which IBM or AWS certification should I start with?"),
+        ("🏢", "How do I land my first tech internship?"),
+        ("💡", "What projects should I build for my portfolio?"),
+        ("📄", "How do I write a strong software engineer resume?"),
+        ("💰", "What are the highest paying tech jobs in 2025?"),
+        ("🎤", "How do I prepare for technical interviews?"),
+        ("🌐", "What are the top technologies to learn this year?"),
+        ("🤝", "How do I network and find job referrals on LinkedIn?"),
+      ] %}
+      <button class="sq" onclick="sendChip('{{ q | replace("'", "\\'") }}')" title="Click to ask">
+        <span style="flex-shrink:0;">{{ icon }}</span><span>{{ q }}</span>
+      </button>
+      {% endfor %}
+    </div>
+
+    <!-- Tips -->
+    <div class="s-card">
+      <div class="s-title">💡 Tips for Best Results</div>
+      <div style="font-size:11.5px;color:var(--text-secondary);line-height:1.8;display:flex;flex-direction:column;gap:2px;">
+        <div>✦ Be specific — mention your skills & goals</div>
+        <div>✦ Ask follow-up questions to go deeper</div>
+        <div>✦ Request step-by-step plans</div>
+        <div>✦ Ask for resource or course recommendations</div>
+      </div>
+    </div>
+
+    <!-- Model info -->
+    <div class="s-card">
+      <div class="s-title">⚙️ Model Info</div>
+      <div style="font-size:11px;color:var(--text-secondary);display:flex;flex-direction:column;gap:4px;">
+        <div style="display:flex;justify-content:space-between;">
+          <span>Model</span><strong style="color:var(--text-primary);">Granite 13B Chat v2</strong>
+        </div>
+        <div style="display:flex;justify-content:space-between;">
+          <span>Platform</span><strong style="color:var(--text-primary);">IBM watsonx.ai</strong>
+        </div>
+        <div style="display:flex;justify-content:space-between;">
+          <span>Region</span><strong style="color:var(--text-primary);">us-south</strong>
+        </div>
+        <div style="display:flex;justify-content:space-between;">
+          <span>Mode</span><strong style="color:#24a148;">Live API</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- Related tools -->
+    <div class="s-card">
+      <div class="s-title">🔗 Related Tools</div>
+      <div style="display:flex;flex-direction:column;gap:5px;">
+        <a href="{{ url_for('skill_gap') }}"      class="btn btn-secondary btn-sm" style="font-size:11px;">🎯 Skill Gap Analysis</a>
+        <a href="{{ url_for('roadmap') }}"        class="btn btn-secondary btn-sm" style="font-size:11px;">🗺️ Learning Roadmap</a>
+        <a href="{{ url_for('certifications') }}" class="btn btn-secondary btn-sm" style="font-size:11px;">🏆 Certifications</a>
+        <a href="{{ url_for('projects') }}"       class="btn btn-secondary btn-sm" style="font-size:11px;">💡 Project Ideas</a>
+        <a href="{{ url_for('reports') }}"        class="btn btn-secondary btn-sm" style="font-size:11px;">📄 Career Report</a>
+      </div>
+    </div>
+
+  </div><!-- /mentor-sidebar -->
+
+</div><!-- /mentor-layout -->
+{% endblock %}
+
+{% block scripts %}
+<script>
+// ══════════════════════════════════════════════════════════════
+//  AI Career Mentor — IBM Granite Chat Interface
+//  Calls Flask /api/chat  →  IBM watsonx.ai  →  Granite model
+// ══════════════════════════════════════════════════════════════
+
+var isWaiting = false;   // prevent double sends
+
+// ── Auto-resize textarea ──────────────────────────────────────
+var input = document.getElementById('chatInput');
+input.addEventListener('input', function () {
+  this.style.height = 'auto';
+  this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+});
+
+// ── Enter = send, Shift+Enter = new line ─────────────────────
+input.addEventListener('keydown', function (e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+});
+
+// ── Send message from input box ──────────────────────────────
+function sendMessage() {
+  var text = input.value.trim();
+  if (!text || isWaiting) return;
+  input.value = '';
+  input.style.height = 'auto';
+  doSend(text);
+}
+
+// ── Send from chip / quick question button ───────────────────
+function sendChip(text) {
+  if (isWaiting) return;
+  // Hide welcome card on first real interaction
+  var wc = document.getElementById('welcomeCard');
+  if (wc) wc.style.display = 'none';
+  doSend(text);
+}
+
+// ── Core send function ────────────────────────────────────────
+function doSend(text) {
+  if (isWaiting) return;
+  isWaiting = true;
+
+  // Hide welcome card
+  var wc = document.getElementById('welcomeCard');
+  if (wc) wc.style.display = 'none';
+
+  // Disable send button
+  var btn = document.getElementById('sendBtn');
+  btn.disabled = true;
+
+  // Append user bubble
+  appendMsg('user', escapeHtml(text));
+
+  // Show typing indicator
+  var typingId = appendTyping();
+
+  // POST to /api/chat
+  fetch('/api/chat', {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify({ message: text }),
+  })
+  .then(function (res) { return res.json(); })
+  .then(function (data) {
+    removeTyping(typingId);
+    if (data.ok) {
+      appendMsg('bot', formatReply(data.result));
+    } else {
+      appendMsg('error', '⚠️ ' + escapeHtml(data.result));
+    }
+  })
+  .catch(function (err) {
+    removeTyping(typingId);
+    appendMsg('error', '⚠️ Could not reach the server. Is Flask running?');
+  })
+  .finally(function () {
+    isWaiting = false;
+    btn.disabled = false;
+    document.getElementById('chatInput').focus();
+  });
+}
+
+// ── Append a message bubble ───────────────────────────────────
+function appendMsg(role, html) {
+  var box = document.getElementById('chatMessages');
+  var avatarContent = role === 'user'
+    ? '{{ profile.full_name[0] if profile.profile_complete and profile.full_name else "U" }}'
+    : (role === 'error' ? '⚠' : '🤖');
+
+  var div = document.createElement('div');
+  div.className = 'msg ' + role;
+  div.innerHTML =
+    '<div class="msg-avatar">' + avatarContent + '</div>' +
+    '<div class="msg-bubble">' + html + '</div>';
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+}
+
+// ── Typing indicator ──────────────────────────────────────────
+function appendTyping() {
+  var box = document.getElementById('chatMessages');
+  var id  = 'typing-' + Date.now();
+  var div = document.createElement('div');
+  div.className = 'msg bot';
+  div.id = id;
+  div.innerHTML =
+    '<div class="msg-avatar">🤖</div>' +
+    '<div class="msg-bubble"><div class="typing-bubble">' +
+    '<span></span><span></span><span></span>' +
+    '</div></div>';
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+  return id;
+}
+
+function removeTyping(id) {
+  var el = document.getElementById(id);
+  if (el) el.remove();
+}
+
+// ── Format Granite reply (basic markdown → HTML) ──────────────
+function formatReply(text) {
+  // Escape first
+  var s = escapeHtml(text);
+
+  // Bold: **text**
+  s = s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+
+  // Numbered list: lines starting with "1. "
+  s = s.replace(/^(\d+)\.\s+(.+)$/gm, '<li>$2</li>');
+  s = s.replace(/(<li>.*<\/li>)/s, function(m) {
+    return '<ol>' + m + '</ol>';
+  });
+
+  // Bullet list: lines starting with "- " or "• "
+  s = s.replace(/^[-•]\s+(.+)$/gm, '<li>$1</li>');
+
+  // Wrap consecutive <li> not already in <ol> into <ul>
+  s = s.replace(/(?<!<\/ol>)(<li>[\s\S]*?<\/li>)(?!\s*<\/[ou]l>)/g, function(m) {
+    if (m.indexOf('<ol>') === -1) return '<ul>' + m + '</ul>';
+    return m;
+  });
+
+  // Inline code: `code`
+  s = s.replace(/`([^`]+)`/g, '<code>$1</code>');
+
+  // Newlines → paragraphs
+  var parts = s.split(/\n{2,}/);
+  s = parts.map(function(p) {
+    p = p.trim();
+    if (!p) return '';
+    if (p.startsWith('<ul>') || p.startsWith('<ol>') || p.startsWith('<li>')) return p;
+    return '<p>' + p.replace(/\n/g, '<br>') + '</p>';
+  }).join('');
+
+  return s || escapeHtml(text);
+}
+
+// ── HTML escape ───────────────────────────────────────────────
+function escapeHtml(s) {
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+// Focus input on load
+document.addEventListener('DOMContentLoaded', function () {
+  document.getElementById('chatInput').focus();
+});
+</script>
+{% endblock %}
