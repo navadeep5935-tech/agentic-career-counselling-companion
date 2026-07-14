@@ -21,7 +21,7 @@
       <div class="brand-icon">AI</div>
       <div>
         <div class="brand-text">Career Companion</div>
-        <div class="brand-sub">Powered by IBM watsonx</div>
+        <div class="brand-sub">Powered by IBM watsonx Orchestrate</div>
       </div>
     </div>
 
@@ -39,6 +39,14 @@
     <div class="sidebar-section-label">Career Intelligence</div>
     <a href="{{ url_for('dashboard') }}"     class="nav-item {% if active=='dashboard' %}active{% endif %}">
       <span class="nav-icon">📊</span> Career Dashboard
+    </a>
+    <a href="{{ url_for('orchestrate') }}"   class="nav-item {% if active=='orchestrate' %}active{% endif %}">
+      <span class="nav-icon">🧠</span> Orchestrate Agent
+      <span class="nav-badge">NEW</span>
+    </a>
+    <a href="{{ url_for('agent_page') }}"    class="nav-item {% if active=='agent' %}active{% endif %}">
+      <span class="nav-icon">⚡</span> ReAct Agent
+      <span class="nav-badge">AI</span>
     </a>
     <a href="{{ url_for('mentor') }}"        class="nav-item {% if active=='mentor' %}active{% endif %}">
       <span class="nav-icon">🤖</span> AI Career Mentor
@@ -78,7 +86,7 @@
       <span class="nav-icon">✉️</span> Contact
     </a>
 
-    <!-- IBM Granite Status Badge -->
+    <!-- IBM Granite + Orchestrate Status Badge -->
     <div class="sidebar-ai-status" id="sidebarAiStatus">
       <div style="display:flex;align-items:center;gap:8px;">
         <span style="width:8px;height:8px;border-radius:50%;background:#6f6f6f;flex-shrink:0;" id="modelDot"></span>
@@ -88,11 +96,12 @@
         </div>
       </div>
       <div style="margin-top:6px;font-size:10px;color:#6f6f6f;" id="modelPlatform">watsonx.ai · us-south</div>
+      <div style="margin-top:4px;font-size:10px;color:#4589ff;">✦ Watson Orchestrate Agent</div>
     </div>
 
     <div class="sidebar-footer">
       © 2024 Career Companion<br>
-      <span style="color:#4589ff;">IBM watsonx.ai</span>
+      <span style="color:#4589ff;">IBM watsonx Orchestrate</span>
     </div>
   </aside>
 
@@ -129,6 +138,28 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 {% block scripts %}{% endblock %}
+
+<!-- ══ IBM Watson Orchestrate — Floating Chat Widget ══ -->
+<div id="wxo-chat-root"></div>
+<script>
+  window.wxOConfiguration = {
+    orchestrationID: "1c1158f96dd549c5ad7f96c4c251cd49_e579e7d6-43d7-47b2-945e-82fb3ec5e41c",
+    hostURL: "https://us-south.watson-orchestrate.cloud.ibm.com",
+    rootElementID: "wxo-chat-root",
+    deploymentPlatform: "ibmcloud",
+    crn: "crn:v1:bluemix:public:watsonx-orchestrate:us-south:a/1c1158f96dd549c5ad7f96c4c251cd49:e579e7d6-43d7-47b2-945e-82fb3ec5e41c::",
+    chatOptions: {
+      agentId: "6bd6b080-7ec0-4802-b6ed-84051e332f59",
+      agentEnvironmentId: "fd30e2a6-d90b-4be0-90f4-1bdceb07092d"
+    }
+  };
+  setTimeout(function () {
+    var s = document.createElement('script');
+    s.src = window.wxOConfiguration.hostURL + '/wxochat/wxoLoader.js?embed=true';
+    s.addEventListener('load', function () { wxoLoader.init(); });
+    document.head.appendChild(s);
+  }, 0);
+</script>
 
 <script>
 /* ── IBM Granite Model Status — fetch once on page load ── */

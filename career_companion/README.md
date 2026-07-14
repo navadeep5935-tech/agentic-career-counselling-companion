@@ -1,244 +1,176 @@
-# 🚀 Agentic Career Counseling Companion
+# Agentic Career Counselling Companion
 
-> An AI-powered career development platform built on **IBM watsonx Orchestrate** — helping students discover career paths, identify skill gaps, and build personalized development roadmaps.
+> An AI-powered career development platform built on **IBM Granite** (watsonx.ai) and
+> **IBM Watson Orchestrate** — helping students discover career paths, identify skill gaps,
+> and build personalised development roadmaps through genuine Agentic AI.
 
----
-
-## 📋 Table of Contents
-
-- [Overview](#overview)
-- [Features](#features)
-- [Tech Stack](#tech-stack)
-- [Project Structure](#project-structure)
-- [Installation](#installation)
-- [Running the App](#running-the-app)
-- [Deployment](#deployment)
-- [IBM watsonx Orchestrate Integration](#ibm-watsonx-orchestrate-integration)
-- [Screenshots](#screenshots)
+[![Python](https://img.shields.io/badge/Python-3.11-blue?logo=python)](https://python.org)
+[![Flask](https://img.shields.io/badge/Flask-3.0.3-black?logo=flask)](https://flask.palletsprojects.com)
+[![IBM Granite](https://img.shields.io/badge/IBM%20Granite-watsonx.ai-0f62fe)](https://www.ibm.com/watsonx)
+[![Watson Orchestrate](https://img.shields.io/badge/IBM-Watson%20Orchestrate-8a3ffc)](https://www.ibm.com/products/watsonx-orchestrate)
+[![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
 ---
 
-## 🎯 Overview
+## Problem Solved
 
-Students today face fragmented career guidance, limited self-awareness of academic strengths, and rapidly changing technology demands. The **Agentic Career Counseling Companion** solves this with:
-
-- ✅ **AI-powered career mentor** (IBM watsonx Orchestrate)
-- ✅ **Personalized career intelligence dashboard**
-- ✅ **Skill gap analysis** with visual analytics
-- ✅ **3-year learning roadmap** with courses, certs, and milestones
-- ✅ **Project recommendation hub** (Beginner → Advanced)
-- ✅ **Certification center** (IBM, AWS, Google, Microsoft, Coursera)
-- ✅ **Internship preparation & application strategy**
-- ✅ **Portfolio builder** (Resume, LinkedIn, GitHub, Website)
-- ✅ **Industry insights** with emerging tech and job market data
-- ✅ **Career report generator** (Print to PDF)
+Students today have no personalised, scalable, always-updated career guidance.
+This platform gives every student a **24/7 Agentic AI career advisor** powered by
+IBM Granite on watsonx.ai, orchestrated by IBM Watson Orchestrate.
 
 ---
 
-## ✨ Features
+## Agentic AI Architecture
 
-| Feature | Description |
-|--------|-------------|
-| 🏠 Home | Hero landing page with platform overview |
-| 👤 Student Profile | Collects academic details, skills, interests, and goals |
-| 📊 Career Dashboard | Scores, charts, skill radar, growth timeline |
-| 🤖 AI Career Mentor | IBM watsonx Orchestrate embedded agent |
-| 🎯 Skill Gap Analysis | Current vs. required skills for target industry |
-| 🗺️ Learning Roadmap | 0–3m, 3–12m, 1–3yr structured development plan |
-| 💡 Projects | Curated beginner/intermediate/advanced project ideas |
-| 🏆 Certifications | IBM, AWS, GCP, Microsoft, Coursera, edX guide |
-| 🏢 Internship Center | Prep tips, application strategy, interview guides |
-| 🖼️ Portfolio Builder | Resume, LinkedIn, GitHub, website optimization |
-| 📄 Career Reports | Printable PDF career development report |
-| 🌐 Industry Insights | Trends, demand index, future jobs, growth areas |
-| ✉️ Contact | Support form and platform info |
+This project implements **three layers of Agentic AI**:
+
+### Layer 1 — IBM Watson Orchestrate (Live Agent Widget)
+A real Watson Orchestrate agent is embedded on every page via the official
+`wxoLoader.js` embed SDK. The agent has a live `agentId` and `agentEnvironmentId`
+on IBM Cloud us-south.
+
+| Property | Value |
+|---|---|
+| orchestrationID | `1c1158f96dd549c5ad7f96c4c251cd49_e579e7d6-43d7-47b2-945e-82fb3ec5e41c` |
+| agentId | `6bd6b080-7ec0-4802-b6ed-84051e332f59` |
+| agentEnvironmentId | `fd30e2a6-d90b-4be0-90f4-1bdceb07092d` |
+| hostURL | `https://us-south.watson-orchestrate.cloud.ibm.com` |
+| deploymentPlatform | `ibmcloud` |
+
+### Layer 2 — ReAct Agent Loop (Python backend)
+The `/api/agent-chat` endpoint implements a full **ReAct (Reason + Act)** loop
+inside Python using IBM Granite as the reasoning engine:
+
+```
+User Question
+    → Granite: Thought + Action (picks a tool)
+    → Tool executes (another focused Granite call)
+    → Observation fed back to Granite
+    → Granite: next Thought + Action  (repeat up to 5 times)
+    → Granite: Final Answer (synthesised from all observations)
+```
+
+**5 callable tools** registered in `AGENT_TOOLS`:
+
+| Tool | What it does |
+|---|---|
+| `skill_gap_analysis` | Current strengths vs. missing skills for target industry |
+| `learning_roadmap` | 3-phase roadmap: 0-3m, 3-12m, 1-3yr |
+| `certification_advisor` | Top 3 IBM/AWS/Google/Microsoft certs |
+| `industry_insights` | 2025 trends, salaries, hot skills |
+| `interview_preparation` | 2-week prep plan + likely questions |
+
+**Conversation memory** is stored in the Flask session (last 10 turns) so the agent
+remembers context across questions.
+
+### Layer 3 — 10 Specialised Granite Agents
+Individual IBM Granite prompt-based agents for focused tasks:
+Cover Letter, Portfolio Review, Career Report, Dashboard Insights, etc.
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 | Layer | Technology |
-|-------|-----------|
-| **AI Engine** | IBM watsonx Orchestrate (embedded agent) |
-| **Backend** | Python 3.10+ / Flask 3.0 |
-| **Frontend** | HTML5, CSS3, Vanilla JavaScript |
-| **Charts** | Chart.js 4.4 (CDN) |
-| **Fonts** | IBM Plex Sans (Google Fonts CDN) |
-| **Session** | Flask server-side sessions |
+|---|---|
+| **Agentic Orchestration** | IBM Watson Orchestrate (live agent, embedded widget) |
+| **ReAct Agent Loop** | Custom Python ReAct implementation — IBM Granite reasoning |
+| **AI Model** | IBM Granite 3 8B Instruct (watsonx.ai) |
+| **AI Platform** | IBM watsonx.ai · Watson Machine Learning |
+| **Backend** | Python 3.11 · Flask 3.0.3 |
+| **Frontend** | HTML5 · CSS3 · Vanilla JS · Chart.js |
+| **Design** | IBM Carbon Design System inspired |
+| **Deploy** | Render.com · Gunicorn |
 
 ---
 
-## 📂 Project Structure
+## Features
 
-```
-career_companion/
-├── app.py                    # Flask application & routes
-├── requirements.txt          # Python dependencies
-├── README.md
-├── templates/
-│   ├── base.html             # Base layout (sidebar, topbar)
-│   ├── home.html             # Landing page
-│   ├── about.html            # About the platform
-│   ├── profile.html          # Student profile form
-│   ├── dashboard.html        # Career intelligence dashboard
-│   ├── mentor.html           # AI Career Mentor (watsonx embed)
-│   ├── skill_gap.html        # Skill gap analysis
-│   ├── roadmap.html          # Learning roadmap
-│   ├── projects.html         # Project recommendations
-│   ├── certifications.html   # Certification center
-│   ├── internship.html       # Internship & opportunity center
-│   ├── portfolio.html        # Portfolio builder guide
-│   ├── reports.html          # Career report generator
-│   ├── industry.html         # Industry insights center
-│   └── contact.html          # Contact & support
-└── static/
-    ├── css/
-    │   └── main.css          # IBM-inspired design system + dark mode
-    └── js/
-        └── main.js           # Charts, tabs, theme, interactivity
-```
+| Feature | AI Layer | Description |
+|---|---|---|
+| Watson Orchestrate Widget | Orchestrate Agent | Live IBM agent on every page (bottom-right) |
+| ReAct Agent Chat | ReAct Loop | Multi-step reasoning with tool-calling |
+| AI Career Mentor | Granite | Real-time personalised career chat |
+| Skill Gap Analysis | Granite + Tool | Current skills vs industry requirements |
+| Learning Roadmap | Granite + Tool | 3-phase personalised development plan |
+| Career Report | Granite | Professional PDF-ready career assessment |
+| Project Ideas | Granite | 6 portfolio projects (beginner to advanced) |
+| Certification Advisor | Granite + Tool | Top 3-5 IBM, AWS, Google, Microsoft certs |
+| Interview Prep | Granite + Tool | Personalised 2-week prep plan |
+| Cover Letter | Granite | AI-written, ready to paste |
+| Portfolio Review | Granite | LinkedIn, GitHub, Resume copy |
+| Industry Insights | Granite + Tool | 2025 trends, salaries, top companies |
 
 ---
 
-## ⚙️ Installation
-
-### Prerequisites
-
-- Python 3.10 or higher
-- pip
-
-### Steps
+## Local Setup
 
 ```bash
-# 1. Clone the repository
-git clone https://github.com/your-username/agentic-career-companion.git
-cd agentic-career-companion/career_companion
+# 1. Clone
+git clone https://github.com/navadeep5935-tech/agentic-career-counselling-companion.git
+cd agentic-career-counselling-companion/career_companion
 
-# 2. Create a virtual environment (recommended)
+# 2. Virtual environment
 python -m venv venv
+venv\Scripts\activate        # Windows
+# source venv/bin/activate   # Mac/Linux
 
-# On Windows:
-venv\Scripts\activate
-
-# On macOS/Linux:
-source venv/bin/activate
-
-# 3. Install dependencies
+# 3. Install
 pip install -r requirements.txt
-```
 
----
+# 4. Environment variables
+copy .env.example .env
+# Edit .env with your IBM credentials
 
-## ▶️ Running the App
-
-```bash
-# From the career_companion/ directory:
+# 5. Run
 python app.py
 ```
 
-Open your browser at: **http://localhost:5000**
+Open **http://localhost:5000**
 
 ---
 
-## 🚀 Deployment
+## Environment Variables
 
-### Option 1: IBM Cloud Foundry
-
-```bash
-# Install IBM Cloud CLI
-# Login to IBM Cloud
-ibmcloud login
-
-# Deploy as Cloud Foundry app
-ibmcloud cf push career-companion -b python_buildpack
-```
-
-### Option 2: Heroku
-
-```bash
-# Create a Procfile
-echo "web: python app.py" > Procfile
-
-# Deploy to Heroku
-heroku create career-companion
-git push heroku main
-```
-
-### Option 3: Docker
-
-```dockerfile
-FROM python:3.11-slim
-WORKDIR /app
-COPY requirements.txt .
-RUN pip install -r requirements.txt
-COPY . .
-EXPOSE 5000
-CMD ["python", "app.py"]
-```
-
-```bash
-docker build -t career-companion .
-docker run -p 5000:5000 career-companion
-```
-
-### Option 4: Render / Railway (Free Tier)
-
-1. Push code to GitHub
-2. Connect repository on render.com or railway.app
-3. Set start command: `python app.py`
-4. Deploy with one click
+| Variable | Description |
+|---|---|
+| `WX_API_KEY` | IBM Cloud API Key |
+| `WX_PROJECT_ID` | watsonx.ai Project ID |
+| `WX_URL` | `https://us-south.ml.cloud.ibm.com` |
+| `FLASK_SECRET_KEY` | Any random secret string |
+| `WXO_AGENT_ID` | Watson Orchestrate Agent ID |
+| `WXO_AGENT_ENV_ID` | Watson Orchestrate Environment ID |
 
 ---
 
-## 🤖 IBM watsonx Orchestrate Integration
+## Key API Endpoints
 
-The AI Career Mentor page embeds the IBM watsonx Orchestrate agent directly using the official wxo loader script.
-
-**Agent Configuration (in `templates/mentor.html`):**
-
-```javascript
-window.wxOConfiguration = {
-  orchestrationID: "1c1158f96dd549c5ad7f96c4c251cd49_e579e7d6-43d7-47b2-945e-82fb3ec5e41c",
-  hostURL: "https://us-south.watson-orchestrate.cloud.ibm.com",
-  rootElementID: "root",
-  deploymentPlatform: "ibmcloud",
-  crn: "crn:v1:bluemix:public:watsonx-orchestrate:us-south:a/...",
-  chatOptions: {
-    agentId: "6bd6b080-7ec0-4802-b6ed-84051e332f59",
-    agentEnvironmentId: "fd30e2a6-d90b-4be0-90f4-1bdceb07092d",
-  }
-};
-```
-
-The agent loads from IBM Cloud and renders inside the `#root` div on the AI Career Mentor page.
+| Endpoint | Method | Description |
+|---|---|---|
+| `/api/agent-chat` | POST | **ReAct agent** — multi-step tool-calling |
+| `/api/agent-history/clear` | POST | Clear agent conversation memory |
+| `/api/chat` | POST | Granite direct chat |
+| `/api/skill-gap-ai` | POST | AI skill gap analysis |
+| `/api/generate-roadmap` | POST | AI roadmap generation |
+| `/api/cert-recommendations` | POST | AI certification advice |
+| `/api/industry-insights-ai` | POST | AI industry insights |
+| `/api/interview-prep` | POST | AI interview preparation |
+| `/api/cover-letter` | POST | AI cover letter generation |
+| `/api/career-report-ai` | POST | AI career report |
+| `/api/model-status` | GET | Active Granite model status |
 
 ---
 
-## 🎨 Design System
+## Deployment
 
-The platform uses an IBM-inspired design system with:
-
-- **IBM Plex Sans** font family
-- **Dual theme**: Light mode (default) + Dark mode (toggle)
-- **Color palette**: IBM Blue (#0f62fe), Teal (#009d9a), Purple (#7c3aed)
-- **Responsive**: Mobile-first with collapsible sidebar
-- **Charts**: Radar, Line, Bar, Doughnut via Chart.js
+Deployed on **Render.com** — auto-deploys on every push to `main`.
 
 ---
 
-## 📄 License
+## License
 
 MIT License — free to use, modify, and distribute.
 
 ---
 
-## 🙏 Acknowledgments
-
-- **IBM watsonx Orchestrate** — AI Career Counseling Agent
-- **IBM Carbon Design System** — Design inspiration
-- **Chart.js** — Data visualization
-- **IBM Plex Sans** — Typography
-
----
-
-*Built for the IBM watsonx Hackathon 2024 · Powered by IBM watsonx Orchestrate*
+*Built with IBM Granite · watsonx.ai · IBM Watson Orchestrate · Flask*

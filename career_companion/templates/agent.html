@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+{% block title %}ReAct Agent — Agentic Career Companion{% endblock %}
+{% block topbar_title %}ReAct Agentic AI{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <h1>&#9889; ReAct Agentic AI &mdash; IBM Granite on watsonx.ai</h1>
+  <p>Watch the agent <strong>Reason &rarr; Act &rarr; Observe &rarr; Repeat</strong> in real time. It autonomously picks tools, calls them in sequence, and synthesises your answer.</p>
+</div>
+
+<div class="alert alert-info" style="margin-bottom:24px;">
+  <span>&#9889;</span>
+  <div>
+    <strong>Powered by IBM Granite 3 8B Instruct &middot; watsonx.ai &middot; IBM Watson Orchestrate</strong><br>
+    Available tools:
+    {% for t in tools %}
+      <span style="display:inline-block;padding:2px 8px;background:#0f62fe22;color:#4589ff;border-radius:10px;font-size:11px;margin:2px;">{{ t }}</span>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="grid grid-2" style="gap:24px;align-items:start;">
+
+  <!-- Chat Panel -->
+  <div>
+    <div class="card" style="display:flex;flex-direction:column;height:580px;">
+      <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">
+        <h3>Agent Chat</h3>
+        <button id="clearBtn" class="btn btn-sm btn-secondary" style="font-size:11px;">Clear Memory</button>
+      </div>
+      <div id="chatMessages" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;">
+        <div class="agent-msg agent-msg--system">
+          <strong>Agent ready.</strong> Ask anything about your career &mdash; the agent will reason through it, call multiple tools, and give you a comprehensive answer.<br><br>
+          Try: <em>"Help me plan my full career in data science"</em><br>
+          Or: <em>"What certifications should I get and how do I prepare for interviews?"</em>
+        </div>
+      </div>
+      <div style="padding:12px;border-top:1px solid var(--border-color);">
+        <div style="display:flex;gap:8px;">
+          <input id="agentInput" type="text" class="form-control" placeholder="Ask the agent anything about your career..." style="flex:1;" />
+          <button id="sendBtn" class="btn btn-primary">Ask Agent</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reasoning Trace Panel -->
+  <div>
+    <div class="card" style="height:580px;display:flex;flex-direction:column;">
+      <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">
+        <h3>Agent Reasoning Trace</h3>
+        <span id="stepCount" style="font-size:11px;color:var(--text-secondary);">0 tool calls this turn</span>
+      </div>
+      <div id="tracePanel" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;">
+        <p class="text-muted" style="font-size:13px;text-align:center;margin-top:40px;">
+          The agent's thinking will appear here.<br>
+          Each step shows: <strong>Thought &rarr; Action &rarr; Observation</strong>
+        </p>
+      </div>
+    </div>
+
+    <div class="card mt-4">
+      <div class="card-header"><h3>How ReAct Works</h3></div>
+      <div style="padding:16px;font-size:13px;display:flex;flex-direction:column;gap:10px;">
+        <div style="display:flex;gap:10px;align-items:flex-start;">
+          <span style="width:26px;height:26px;border-radius:50%;background:#0f62fe;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;font-size:12px;">1</span>
+          <div><strong>Reason</strong> &mdash; IBM Granite reads your question and decides what it needs to know.</div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-start;">
+          <span style="width:26px;height:26px;border-radius:50%;background:#08bdba;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;font-size:12px;">2</span>
+          <div><strong>Act</strong> &mdash; Calls a tool: skill_gap_analysis, learning_roadmap, certification_advisor, industry_insights, or interview_preparation.</div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-start;">
+          <span style="width:26px;height:26px;border-radius:50%;background:#8a3ffc;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;font-size:12px;">3</span>
+          <div><strong>Observe</strong> &mdash; Tool runs a focused Granite prompt and returns a structured result back to the agent.</div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-start;">
+          <span style="width:26px;height:26px;border-radius:50%;background:#24a148;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;font-size:12px;">4</span>
+          <div><strong>Repeat or Answer</strong> &mdash; Calls more tools if needed (up to 5), then synthesises a final structured answer.</div>
+        </div>
+        <div style="margin-top:4px;padding:10px 12px;background:#0f62fe11;border-radius:6px;border:1px solid #4589ff44;font-size:12px;">
+          This is genuine <strong>Agentic AI</strong>: multi-step reasoning, tool-use, and observation loops built on <strong>IBM Granite &middot; watsonx.ai &middot; Watson Orchestrate</strong>.
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<style>
+.agent-msg{padding:12px 14px;border-radius:8px;font-size:13px;line-height:1.65;}
+.agent-msg--user{background:#0f62fe22;border-left:3px solid #4589ff;margin-left:15%;}
+.agent-msg--agent{background:var(--bg-secondary);border-left:3px solid #24a148;}
+.agent-msg--system{background:#8a3ffc11;border-left:3px solid #8a3ffc;color:var(--text-secondary);}
+.agent-msg--thinking{background:#08bdba11;border-left:3px solid #08bdba;color:var(--text-secondary);font-style:italic;}
+.trace-step{border:1px solid var(--border-color);border-radius:8px;overflow:hidden;font-size:12px;}
+.trace-step-header{padding:8px 12px;background:var(--bg-secondary);font-weight:600;display:flex;gap:8px;align-items:center;}
+.trace-thought{padding:8px 12px;border-top:1px solid var(--border-color);}
+.trace-action{padding:8px 12px;border-top:1px solid var(--border-color);background:#0f62fe08;}
+.trace-obs{padding:8px 12px;border-top:1px solid var(--border-color);background:#24a14808;max-height:130px;overflow-y:auto;white-space:pre-wrap;}
+.trace-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-secondary);margin-bottom:3px;}
+</style>
+{% endblock %}
+{% block scripts %}
+<script>
+(function(){
+  var chatEl=document.getElementById('chatMessages');
+  var traceEl=document.getElementById('tracePanel');
+  var inputEl=document.getElementById('agentInput');
+  var sendBtn=document.getElementById('sendBtn');
+  var clearBtn=document.getElementById('clearBtn');
+  var stepCount=document.getElementById('stepCount');
+
+  function addMsg(html,cls){
+    var d=document.createElement('div');
+    d.className='agent-msg '+cls;
+    d.innerHTML=html;
+    chatEl.appendChild(d);
+    chatEl.scrollTop=chatEl.scrollHeight;
+    return d;
+  }
+
+  function renderTrace(trace){
+    traceEl.innerHTML='';
+    if(!trace||trace.length===0){
+      traceEl.innerHTML='<p class="text-muted" style="font-size:13px;text-align:center;margin-top:40px;">No tools called &mdash; agent answered from reasoning alone.</p>';
+      return;
+    }
+    trace.forEach(function(t){
+      var div=document.createElement('div');
+      div.className='trace-step';
+      div.innerHTML=
+        '<div class="trace-step-header">'+
+          '<span style="background:#0f62fe;color:#fff;padding:2px 8px;border-radius:10px;font-size:11px;">Step '+t.step+'</span>'+
+          '<span style="color:#4589ff;font-size:12px;">'+(t.action||'')+'</span>'+
+        '</div>'+
+        '<div class="trace-thought"><div class="trace-label">Thought</div>'+(t.thought||'(none)')+'</div>'+
+        '<div class="trace-action"><div class="trace-label">Action &rarr; Tool Called</div><strong>'+(t.action||'')+'</strong></div>'+
+        '<div class="trace-obs"><div class="trace-label">Observation (Tool Output)</div>'+(t.observation||'')+'</div>';
+      traceEl.appendChild(div);
+    });
+    traceEl.scrollTop=traceEl.scrollHeight;
+  }
+
+  function sendMessage(){
+    var msg=inputEl.value.trim();
+    if(!msg)return;
+    inputEl.value='';
+    sendBtn.disabled=true;
+    sendBtn.textContent='Thinking\u2026';
+    addMsg(msg,'agent-msg--user');
+    var thinking=addMsg('&#9889; Agent is reasoning and calling tools\u2026','agent-msg--thinking');
+    traceEl.innerHTML='<p class="text-muted" style="font-size:13px;text-align:center;margin-top:20px;">Agent is working\u2026</p>';
+
+    fetch('/api/agent-chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg})})
+    .then(function(r){return r.json();})
+    .then(function(d){
+      chatEl.removeChild(thinking);
+      if(d.ok){
+        addMsg((d.answer||'').replace(/\n/g,'<br>'),'agent-msg--agent');
+        renderTrace(d.trace);
+        var n=d.steps||0;
+        stepCount.textContent=n+' tool call'+(n===1?'':'s')+' this turn';
+      } else {
+        addMsg('<strong>Error:</strong> '+(d.answer||d.result||'Unknown error'),'agent-msg--system');
+      }
+    })
+    .catch(function(err){chatEl.removeChild(thinking);addMsg('<strong>Network error:</strong> '+err,'agent-msg--system');})
+    .finally(function(){sendBtn.disabled=false;sendBtn.textContent='Ask Agent';inputEl.focus();});
+  }
+
+  sendBtn.addEventListener('click',sendMessage);
+  inputEl.addEventListener('keydown',function(e){if(e.key==='Enter')sendMessage();});
+  clearBtn.addEventListener('click',function(){
+    fetch('/api/agent-history/clear',{method:'POST'});
+    chatEl.innerHTML='<div class="agent-msg agent-msg--system">Memory cleared. Start a new conversation.</div>';
+    traceEl.innerHTML='<p class="text-muted" style="font-size:13px;text-align:center;margin-top:40px;">Reasoning trace will appear here.</p>';
+    stepCount.textContent='0 tool calls this turn';
+  });
+}());
+</script>
+{% endblock %}

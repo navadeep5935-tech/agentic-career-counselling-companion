@@ -18,8 +18,8 @@ app.secret_key = os.environ.get("FLASK_SECRET_KEY", "career_companion_secret_202
 # ══════════════════════════════════════════════════════════════
 #  IBM watsonx.ai — Configuration (loaded from environment)
 # ══════════════════════════════════════════════════════════════
-WX_API_KEY    = os.environ.get("WX_API_KEY",    "KLQZFreis9MnOMthb8aKnZV2imw8GNsvY7xdXx4bF3lC")
-WX_PROJECT_ID = os.environ.get("WX_PROJECT_ID", "63364934-bde2-4804-8016-14a1cebeea74")
+WX_API_KEY    = os.environ.get("WX_API_KEY",    "")
+WX_PROJECT_ID = os.environ.get("WX_PROJECT_ID", "")
 WX_URL        = os.environ.get("WX_URL",        "https://us-south.ml.cloud.ibm.com")
 WX_API_VER    = "2024-05-31"   # latest stable version
 
@@ -148,6 +148,23 @@ def call_granite(prompt: str, max_tokens: int = 900) -> str:
     raise last_error or RuntimeError("All IBM watsonx.ai models failed.")
 
 
+# ══════════════════════════════════════════════════════════════
+#  ReAct Agent — Tool Registry
+#  Granite decides WHICH tools to call and in what order.
+#  Pattern: Reason → Act → Observe → Reason → Final Answer
+# ══════════════════════════════════════════════════════════════
+
+AGENT_TOOLS = {}   # name -> {"description": str, "fn": callable}
+
+
+def _register_tool(name: str, description: str):
+    """Decorator: register a Python function as an agent-callable tool."""
+    def decorator(fn):
+        AGENT_TOOLS[name] = {"description": description, "fn": fn}
+        return fn
+    return decorator
+
+
 def build_profile_context(profile: dict) -> str:
     """Build a concise profile block to inject into any Granite prompt."""
     if not profile.get("profile_complete"):
@@ -163,6 +180,207 @@ def build_profile_context(profile: dict) -> str:
         f"Target Industry: {profile.get('preferred_industry','Technology')}\n"
         f"Location: {profile.get('preferred_location','Not specified')}\n"
     )
+
+
+@_register_tool(
+    "skill_gap_analysis",
+    "Analyses the student's current skills vs industry requirements. Returns strengths "
+    "and critical missing skills for their target industry."
+)
+def tool_skill_gap(profile: dict, **_) -> str:
+    ctx = build_profile_context(profile)
+    prompt = (
+        "<|system|>\nYou are a technical skills assessment expert.\n"
+        "<|user|>\n"
+        f"Profile:\n{ctx}\n\n"
+        "Return a concise skill gap analysis:\n"
+        "STRENGTHS: (comma-separated)\nMISSING: (comma-separated)\nTOP_3_TO_LEARN: (numbered)\n"
+        "<|assistant|>\n"
+    )
+    return call_granite(prompt, max_tokens=400)
+
+
+@_register_tool(
+    "learning_roadmap",
+    "Generates a personalised 3-phase roadmap (0-3 months, 3-12 months, 1-3 years) "
+    "with technologies, courses, and milestones for the student's career goal."
+)
+def tool_roadmap(profile: dict, **_) -> str:
+    ctx = build_profile_context(profile)
+    prompt = (
+        "<|system|>\nYou are a career development expert.\n"
+        "<|user|>\n"
+        f"Profile:\n{ctx}\n\n"
+        "Summarise a 3-phase roadmap:\n"
+        "PHASE1 (0-3mo): 3 technologies + 1 milestone\n"
+        "PHASE2 (3-12mo): 3 technologies + 1 milestone\n"
+        "PHASE3 (1-3yr): 3 technologies + 1 milestone\n"
+        "<|assistant|>\n"
+    )
+    return call_granite(prompt, max_tokens=400)
+
+
+@_register_tool(
+    "certification_advisor",
+    "Recommends the top 3 certifications (IBM, AWS, Google, Microsoft) best matched "
+    "to the student's career goal and skill level."
+)
+def tool_certifications(profile: dict, **_) -> str:
+    ctx = build_profile_context(profile)
+    prompt = (
+        "<|system|>\nYou are a professional certification advisor.\n"
+        "<|user|>\n"
+        f"Profile:\n{ctx}\n\n"
+        "List the top 3 certifications: Name, Provider, Why it fits, Study time.\n"
+        "<|assistant|>\n"
+    )
+    return call_granite(prompt, max_tokens=400)
+
+
+@_register_tool(
+    "industry_insights",
+    "Returns 2025 industry trends, top in-demand roles with salaries, and the single "
+    "most important technology to learn for the student's target industry."
+)
+def tool_industry(profile: dict, **_) -> str:
+    ctx = build_profile_context(profile)
+    industry = profile.get("preferred_industry", "Technology")
+    prompt = (
+        "<|system|>\nYou are a senior tech industry analyst.\n"
+        "<|user|>\n"
+        f"Profile:\n{ctx}\n\n"
+        f"For {industry} in 2025:\n"
+        "TOP_ROLES: (3 roles + salary range)\nHOT_SKILLS: (5 skills)\nLEARN_NOW: (1 technology)\n"
+        "<|assistant|>\n"
+    )
+    return call_granite(prompt, max_tokens=400)
+
+
+@_register_tool(
+    "interview_preparation",
+    "Creates a personalised interview prep plan: technical topics, likely questions, "
+    "and a 2-week preparation schedule for the student's target role."
+)
+def tool_interview(profile: dict, **_) -> str:
+    ctx = build_profile_context(profile)
+    target = profile.get("career_goals", "Software Engineer")
+    prompt = (
+        "<|system|>\nYou are an expert technical interview coach.\n"
+        "<|user|>\n"
+        f"Profile:\n{ctx}\nTarget role: {target}\n\n"
+        "Give:\nTOPICS: (5 topics)\nQUESTIONS: (3 questions)\nWEEK1: (3 tasks)\nWEEK2: (3 tasks)\n"
+        "<|assistant|>\n"
+    )
+    return call_granite(prompt, max_tokens=400)
+
+
+# ── ReAct Agent Core ──────────────────────────────────────────
+MAX_REACT_STEPS = 5
+
+
+def _build_tool_descriptions() -> str:
+    return "\n".join(
+        f"  - {name}: {meta['description']}"
+        for name, meta in AGENT_TOOLS.items()
+    )
+
+
+def run_react_agent(user_message: str, profile: dict, history: list) -> dict:
+    """ReAct loop: Granite reasons, picks a tool, observes result, repeats."""
+    tool_list   = _build_tool_descriptions()
+    profile_ctx = build_profile_context(profile)
+
+    system_prompt = (
+        "You are an Agentic Career Counselling AI built on IBM Watson Orchestrate, "
+        "powered by IBM Granite on watsonx.ai.\n\n"
+        "Available tools:\n"
+        f"{tool_list}\n\n"
+        "On EVERY step output EXACTLY:\n"
+        "Thought: <reasoning>\n"
+        "Action: <tool_name>   (one tool from the list)\n\n"
+        "When you have enough information:\n"
+        "Thought: <reasoning>\n"
+        "Action: None\n"
+        "Final Answer: <detailed, structured, encouraging answer>\n\n"
+        "Rules: one tool per step. After each Observation decide: another tool or Final Answer."
+    )
+
+    # Build context with last 3 turns of conversation memory
+    ctx_parts = [f"<|system|>\n{system_prompt}\n"]
+    for h in history[-6:]:
+        ctx_parts.append(f"<|user|>\n{h['user']}\n<|assistant|>\n{h['assistant']}\n")
+    ctx_parts.append(
+        f"<|user|>\nStudent Profile:\n{profile_ctx}\n\nQuestion: {user_message}\n"
+        "<|assistant|>\n"
+    )
+    running_ctx = "".join(ctx_parts)
+
+    trace        = []
+    final_answer = ""
+
+    for step in range(1, MAX_REACT_STEPS + 1):
+        raw = call_granite(running_ctx, max_tokens=700)
+
+        thought      = ""
+        action_name  = None
+        final_answer = ""
+        answer_found = False
+
+        lines = raw.splitlines()
+        for i, line in enumerate(lines):
+            ls = line.strip()
+            if ls.startswith("Thought:"):
+                thought = ls[len("Thought:"):].strip()
+            elif ls.startswith("Action:"):
+                act = ls[len("Action:"):].strip()
+                if act.lower() not in ("none", ""):
+                    action_name = act.strip()
+            elif ls.startswith("Final Answer:"):
+                final_answer = ls[len("Final Answer:"):].strip()
+                for cont in lines[i + 1:]:
+                    final_answer += " " + cont.strip()
+                answer_found = True
+                break
+
+        # No structured tags at all — treat whole output as final answer
+        if not action_name and not answer_found:
+            final_answer = raw.strip()
+            answer_found = True
+
+        # Execute tool
+        if action_name:
+            tool_meta = AGENT_TOOLS.get(action_name)
+            if tool_meta:
+                try:
+                    observation = tool_meta["fn"](profile=profile)
+                except Exception as exc:
+                    observation = f"Tool error: {exc}"
+            else:
+                observation = (
+                    f"Unknown tool '{action_name}'. "
+                    f"Available: {', '.join(AGENT_TOOLS.keys())}"
+                )
+
+            trace.append({
+                "step":        step,
+                "thought":     thought,
+                "action":      action_name,
+                "observation": observation,
+            })
+            running_ctx += (
+                f"Thought: {thought}\nAction: {action_name}\n"
+                f"Observation: {observation}\n"
+            )
+
+        if answer_found or not action_name:
+            break
+
+    return {
+        "answer": final_answer or "I was unable to generate a response. Please try again.",
+        "trace":  trace,
+        "steps":  len(trace),
+    }
+
 
 
 # ── Agentic task: Career Chat ─────────────────────────────────
@@ -488,6 +706,15 @@ def reports():
 def industry():
     return render_template("industry.html", profile=get_profile(), active="industry")
 
+@app.route("/orchestrate")
+def orchestrate():
+    return render_template("orchestrate.html", profile=get_profile(), active="orchestrate")
+
+@app.route("/agent")
+def agent_page():
+    return render_template("agent.html", profile=get_profile(), active="agent",
+                           tools=list(AGENT_TOOLS.keys()))
+
 @app.route("/contact")
 def contact():
     return render_template("contact.html", profile=get_profile(), active="contact")
@@ -549,6 +776,47 @@ def api_chat():
         return jsonify({"ok": False, "result": "Please enter a message."}), 400
     profile = get_profile()
     return _granite_endpoint(lambda: ask_granite_chat(message, profile))
+
+
+@app.route("/api/agent-chat", methods=["POST"])
+def api_agent_chat():
+    """
+    ReAct agentic endpoint.
+    Granite reasons about the user's message, selects tools from AGENT_TOOLS,
+    calls them, observes results, and synthesises a final answer — all in one
+    multi-step loop. Conversation history is stored in the Flask session.
+    """
+    data    = request.get_json(silent=True) or {}
+    message = (data.get("message") or "").strip()
+    if not message:
+        return jsonify({"ok": False, "result": "Please enter a message."}), 400
+
+    profile = get_profile()
+    # Persist agent conversation history in session (max 10 turns)
+    history = session.get("agent_history", [])
+
+    try:
+        result = run_react_agent(message, profile, history)
+    except Exception as e:
+        return _granite_endpoint(lambda: (_ for _ in ()).throw(e))  # re-use error handler
+
+    # Save this turn to session history
+    history.append({"user": message, "assistant": result["answer"]})
+    session["agent_history"] = history[-10:]
+
+    return jsonify({
+        "ok":     True,
+        "answer": result["answer"],
+        "trace":  result["trace"],
+        "steps":  result["steps"],
+    })
+
+
+@app.route("/api/agent-history/clear", methods=["POST"])
+def api_agent_history_clear():
+    """Clear the agent's conversation memory for the current session."""
+    session.pop("agent_history", None)
+    return jsonify({"ok": True})
 
 
 @app.route("/api/generate-roadmap", methods=["POST"])

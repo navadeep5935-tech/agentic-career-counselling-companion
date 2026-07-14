@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% block title %}Watson Orchestrate Agent — Agentic Career Companion{% endblock %}
+{% block topbar_title %}IBM Watson Orchestrate Agent{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <h1>&#129504; IBM Watson Orchestrate Agent</h1>
+  <p>Your career guidance is powered by a live IBM Watson Orchestrate agent &mdash; an autonomous AI that reasons, plans, and acts on your behalf.</p>
+</div>
+
+<div class="alert alert-info" style="margin-bottom:24px;">
+  <span>&#10022;</span>
+  <div>
+    <strong>Live Watson Orchestrate Instance</strong> &mdash;
+    Agent ID: <code>6bd6b080-7ec0-4802-b6ed-84051e332f59</code> &nbsp;|&nbsp;
+    Environment: <code>fd30e2a6-d90b-4be0-90f4-1bdceb07092d</code> &nbsp;|&nbsp;
+    Region: <code>us-south</code>
+  </div>
+</div>
+
+<div class="grid grid-2" style="gap:24px;align-items:start;">
+
+  <div>
+    <div class="card">
+      <div class="card-header"><h3>What this Agent Does</h3></div>
+      <ul style="padding:0 16px 16px;margin:0;list-style:none;display:flex;flex-direction:column;gap:12px;">
+        <li style="display:flex;gap:10px;">
+          <span style="color:var(--accent-blue);font-size:18px;flex-shrink:0;">&#127919;</span>
+          <div><strong>Understands your career goal</strong><br><span class="text-muted">Interprets intent and plans multi-step responses autonomously.</span></div>
+        </li>
+        <li style="display:flex;gap:10px;">
+          <span style="color:var(--accent-teal);font-size:18px;flex-shrink:0;">&#128279;</span>
+          <div><strong>Orchestrates multiple AI skills</strong><br><span class="text-muted">Chains skill gap, roadmap, certifications in one conversation.</span></div>
+        </li>
+        <li style="display:flex;gap:10px;">
+          <span style="color:var(--accent-purple);font-size:18px;flex-shrink:0;">&#129513;</span>
+          <div><strong>Tool-using Agentic AI</strong><br><span class="text-muted">IBM Granite as reasoning core, invoking tools to fulfil complex queries.</span></div>
+        </li>
+        <li style="display:flex;gap:10px;">
+          <span style="color:var(--accent-green);font-size:18px;flex-shrink:0;">&#128172;</span>
+          <div><strong>Persistent conversation memory</strong><br><span class="text-muted">Remembers context across turns.</span></div>
+        </li>
+      </ul>
+    </div>
+
+    <div class="card mt-4">
+      <div class="card-header"><h3>Architecture</h3></div>
+      <div style="padding:16px;display:flex;flex-direction:column;gap:8px;font-size:13px;">
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg-secondary);border-radius:6px;border-left:3px solid #4589ff;">
+          <span>&#127758;</span><div><strong>IBM Watson Orchestrate</strong><br><span class="text-muted">us-south.watson-orchestrate.cloud.ibm.com</span></div>
+        </div>
+        <div style="text-align:center;font-size:18px;color:var(--text-secondary);">&#8597;</div>
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg-secondary);border-radius:6px;border-left:3px solid #08bdba;">
+          <span>&#129302;</span><div><strong>IBM Granite 3 8B Instruct</strong><br><span class="text-muted">Reasoning core &mdash; watsonx.ai</span></div>
+        </div>
+        <div style="text-align:center;font-size:18px;color:var(--text-secondary);">&#8597;</div>
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg-secondary);border-radius:6px;border-left:3px solid #8a3ffc;">
+          <span>&#128295;</span><div><strong>Career Tools</strong><br><span class="text-muted">Skill gap, roadmap, certifications, cover letter, insights</span></div>
+        </div>
+        <div style="text-align:center;font-size:18px;color:var(--text-secondary);">&#8597;</div>
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg-secondary);border-radius:6px;border-left:3px solid #24a148;">
+          <span>&#128100;</span><div><strong>Student (You)</strong><br><span class="text-muted">Chat widget on every page (bottom-right)</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="card">
+      <div class="card-header" style="display:flex;align-items:center;justify-content:space-between;">
+        <h3>Live Agent Chat</h3>
+        <span style="font-size:11px;padding:3px 8px;background:#0f62fe22;color:#4589ff;border-radius:12px;font-weight:600;">&#9679; LIVE</span>
+      </div>
+      <div style="padding:16px;">
+        <p class="text-muted" style="font-size:13px;margin-bottom:16px;">
+          The Watson Orchestrate agent is embedded on every page via the floating chat button in the <strong>bottom-right corner</strong>. Click it to start chatting.
+        </p>
+        <div style="background:var(--bg-secondary);border-radius:8px;padding:14px;font-size:12px;font-family:monospace;line-height:1.9;border:1px solid var(--border-color);margin-bottom:16px;">
+          <div><span style="color:#8d8d8d;">orchestrationID &nbsp;</span><span style="color:#4589ff;">1c1158f96dd549c5&#8230;_e579e7d6&#8230;</span></div>
+          <div><span style="color:#8d8d8d;">agentId &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color:#08bdba;">6bd6b080-7ec0-4802-b6ed-84051e332f59</span></div>
+          <div><span style="color:#8d8d8d;">environmentId &nbsp;&nbsp;</span><span style="color:#8a3ffc;">fd30e2a6-d90b-4be0-90f4-1bdceb07092d</span></div>
+          <div><span style="color:#8d8d8d;">platform &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color:#24a148;">ibmcloud &middot; us-south</span></div>
+          <div><span style="color:#8d8d8d;">hostURL &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color:#4589ff;">us-south.watson-orchestrate.cloud.ibm.com</span></div>
+        </div>
+        <div style="background:#0f62fe11;border:1px solid #4589ff44;border-radius:8px;padding:14px;font-size:13px;margin-bottom:16px;">
+          <strong>How to use:</strong>
+          <ol style="margin:8px 0 0 18px;padding:0;display:flex;flex-direction:column;gap:4px;">
+            <li>Click the chat bubble in the <strong>bottom-right corner</strong> of any page</li>
+            <li>Ask e.g. <em>"What skills do I need for data science?"</em></li>
+            <li>The agent autonomously reasons, selects tools, and returns a structured answer</li>
+            <li>Continue the conversation &mdash; it remembers your context</li>
+          </ol>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <a href="https://us-south.watson-orchestrate.cloud.ibm.com" target="_blank" rel="noopener" class="btn btn-primary btn-sm">Open Orchestrate Console &#8599;</a>
+          <a href="{{ url_for('agent_page') }}" class="btn btn-secondary btn-sm">Also try: ReAct Agent</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mt-4">
+      <div class="card-header"><h3>Sample Prompts</h3></div>
+      <div style="padding:16px;display:flex;flex-direction:column;gap:8px;">
+        {% for p in [
+          "What are the top skills I need to become a data scientist in 2025?",
+          "Create a 3-month learning roadmap for cloud computing.",
+          "Which IBM certifications should I pursue for an AI engineering role?",
+          "Write me a cover letter for a software engineer internship at IBM.",
+          "Analyse my skill gaps for a cybersecurity career."
+        ] %}
+        <div style="padding:10px 12px;background:var(--bg-secondary);border-radius:6px;border:1px solid var(--border-color);font-size:13px;cursor:pointer;"
+             title="Click to copy" onclick="navigator.clipboard && navigator.clipboard.writeText('{{ p }}')">
+          <span style="color:var(--accent-blue);">&#10077;</span> {{ p }}
+          <span style="float:right;color:var(--text-secondary);font-size:11px;">copy</span>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
