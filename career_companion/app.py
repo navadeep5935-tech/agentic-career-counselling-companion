@@ -23,6 +23,13 @@ WX_PROJECT_ID = os.environ.get("WX_PROJECT_ID", "")
 WX_URL        = os.environ.get("WX_URL",        "https://us-south.ml.cloud.ibm.com")
 WX_API_VER    = "2024-05-31"   # latest stable version
 
+# ── IBM Watson Orchestrate — Widget config (from environment) ─
+WXO_ORCHESTRATION_ID = os.environ.get("WXO_ORCHESTRATION_ID", "")
+WXO_HOST_URL         = os.environ.get("WXO_HOST_URL", "https://us-south.watson-orchestrate.cloud.ibm.com")
+WXO_CRN              = os.environ.get("WXO_CRN", "")
+WXO_AGENT_ID         = os.environ.get("WXO_AGENT_ID", "")
+WXO_AGENT_ENV_ID     = os.environ.get("WXO_AGENT_ENV_ID", "")
+
 # ── Model fallback list (confirmed working July 2025) ─────────
 # Tested live — only these two respond successfully in this account.
 WX_MODELS = [
@@ -274,6 +281,51 @@ def tool_interview(profile: dict, **_) -> str:
     return call_granite(prompt, max_tokens=400)
 
 
+@_register_tool(
+    "career_pathway_monitor",
+    "Sub-agent: Monitors the student's academic profile and evolving interests to suggest "
+    "2-3 concrete career pathways they are best positioned for right now, with confidence scores."
+)
+def tool_career_pathway(profile: dict, **_) -> str:
+    ctx = build_profile_context(profile)
+    prompt = (
+        "<|system|>\nYou are a career pathway intelligence agent. "
+        "You monitor student academic profiles and evolving interests to recommend optimal career paths.\n"
+        "<|user|>\n"
+        f"Student profile:\n{ctx}\n\n"
+        "Based on this profile, identify the best-fit career pathways:\n"
+        "PATHWAY_1: (title, why it fits, confidence %)\n"
+        "PATHWAY_2: (title, why it fits, confidence %)\n"
+        "PATHWAY_3: (title, why it fits, confidence %)\n"
+        "NEXT_STEP: (single most important action for the student today)\n"
+        "<|assistant|>\n"
+    )
+    return call_granite(prompt, max_tokens=450)
+
+
+@_register_tool(
+    "labor_market_scan",
+    "Sub-agent: Scans real-time labor market trends for the student's target industry — "
+    "demand spikes, emerging roles, salary bands, and companies actively hiring freshers."
+)
+def tool_labor_market(profile: dict, **_) -> str:
+    ctx = build_profile_context(profile)
+    industry = profile.get("preferred_industry", "Technology")
+    prompt = (
+        "<|system|>\nYou are a labor market intelligence agent with deep knowledge of 2025 hiring trends.\n"
+        "<|user|>\n"
+        f"Student profile:\n{ctx}\n\n"
+        f"Scan the {industry} labor market for 2025:\n"
+        "DEMAND_SPIKE: (1 role with highest demand growth right now)\n"
+        "EMERGING_ROLES: (2 new roles that didn't exist 2 years ago)\n"
+        "SALARY_BANDS: (entry/mid/senior for target role)\n"
+        "HIRING_NOW: (3 companies actively hiring freshers in this space)\n"
+        "MARKET_SIGNAL: (1 key trend this student must act on immediately)\n"
+        "<|assistant|>\n"
+    )
+    return call_granite(prompt, max_tokens=450)
+
+
 # ── ReAct Agent Core ──────────────────────────────────────────
 MAX_REACT_STEPS = 5
 
@@ -286,23 +338,37 @@ def _build_tool_descriptions() -> str:
 
 
 def run_react_agent(user_message: str, profile: dict, history: list) -> dict:
-    """ReAct loop: Granite reasons, picks a tool, observes result, repeats."""
+    """
+    Main Orchestrator Agent — ReAct loop.
+    Granite acts as the orchestrator: it reasons about the student's question,
+    dispatches sub-agent tools in sequence, observes their outputs, and
+    synthesises a final personalised career recommendation.
+    Sub-agents: skill_gap_analysis, learning_roadmap, certification_advisor,
+                industry_insights, interview_preparation,
+                career_pathway_monitor, labor_market_scan
+    """
     tool_list   = _build_tool_descriptions()
     profile_ctx = build_profile_context(profile)
 
     system_prompt = (
-        "You are an Agentic Career Counselling AI built on IBM Watson Orchestrate, "
-        "powered by IBM Granite on watsonx.ai.\n\n"
-        "Available tools:\n"
+        "You are the MAIN ORCHESTRATOR AGENT of the Agentic Career Counselling Companion, "
+        "built on IBM Watson Orchestrate and powered by IBM Granite on watsonx.ai.\n\n"
+        "Your mission: continuously monitor student academic performance, evolving interests, "
+        "and real-time labor market trends to deliver tailored, autonomous career pathway "
+        "suggestions — empowering students to make confident, future-ready decisions.\n\n"
+        "You orchestrate a set of SPECIALISED SUB-AGENTS (tools). Each sub-agent is an expert "
+        "in one domain. You decide which sub-agents to call, in what order, and synthesise "
+        "all their outputs into one coherent career guidance response.\n\n"
+        "Available sub-agents:\n"
         f"{tool_list}\n\n"
-        "On EVERY step output EXACTLY:\n"
-        "Thought: <reasoning>\n"
-        "Action: <tool_name>   (one tool from the list)\n\n"
-        "When you have enough information:\n"
-        "Thought: <reasoning>\n"
+        "WORKFLOW — on EVERY reasoning step output EXACTLY:\n"
+        "Thought: <why you are calling this sub-agent>\n"
+        "Action: <sub_agent_name>   (one from the list above)\n\n"
+        "When you have gathered enough intelligence from sub-agents:\n"
+        "Thought: <synthesis reasoning>\n"
         "Action: None\n"
-        "Final Answer: <detailed, structured, encouraging answer>\n\n"
-        "Rules: one tool per step. After each Observation decide: another tool or Final Answer."
+        "Final Answer: <comprehensive, structured, personalised career guidance>\n\n"
+        "Rules: one sub-agent per step. Up to 5 steps. Always end with Final Answer."
     )
 
     # Build context with last 3 turns of conversation memory
@@ -625,6 +691,22 @@ def get_profile() -> dict:
 
 
 # ══════════════════════════════════════════════════════════════
+#  Template Context — inject Watson Orchestrate config globally
+# ══════════════════════════════════════════════════════════════
+@app.context_processor
+def inject_wxo_config():
+    """Inject Watson Orchestrate vars into every template automatically."""
+    return dict(
+        wxo_enabled          = bool(WXO_AGENT_ID),
+        wxo_orchestration_id = WXO_ORCHESTRATION_ID,
+        wxo_host_url         = WXO_HOST_URL,
+        wxo_crn              = WXO_CRN,
+        wxo_agent_id         = WXO_AGENT_ID,
+        wxo_agent_env_id     = WXO_AGENT_ENV_ID,
+    )
+
+
+# ══════════════════════════════════════════════════════════════
 #  Page Routes
 # ══════════════════════════════════════════════════════════════
 @app.route("/")
@@ -663,10 +745,6 @@ def dashboard():
     profile = get_profile()
     return render_template("dashboard.html", profile=profile,
                            scores=compute_scores(profile), active="dashboard")
-
-@app.route("/mentor")
-def mentor():
-    return render_template("mentor.html", profile=get_profile(), active="mentor")
 
 @app.route("/skill-gap")
 def skill_gap():
@@ -708,12 +786,19 @@ def industry():
 
 @app.route("/orchestrate")
 def orchestrate():
-    return render_template("orchestrate.html", profile=get_profile(), active="orchestrate")
+    # Unified hub — open on Orchestrate tab
+    return redirect(url_for("agent_page", tab="orchestrate"))
+
+@app.route("/mentor")
+def mentor():
+    # Unified hub — open on Career Mentor tab
+    return redirect(url_for("agent_page", tab="mentor"))
 
 @app.route("/agent")
 def agent_page():
+    tab = request.args.get("tab", "orchestrate")
     return render_template("agent.html", profile=get_profile(), active="agent",
-                           tools=list(AGENT_TOOLS.keys()))
+                           tools=list(AGENT_TOOLS.keys()), initial_tab=tab)
 
 @app.route("/contact")
 def contact():
