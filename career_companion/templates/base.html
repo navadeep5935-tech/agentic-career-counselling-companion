@@ -40,17 +40,10 @@
     <a href="{{ url_for('dashboard') }}"     class="nav-item {% if active=='dashboard' %}active{% endif %}">
       <span class="nav-icon">📊</span> Career Dashboard
     </a>
-    <a href="{{ url_for('orchestrate') }}"   class="nav-item {% if active=='orchestrate' %}active{% endif %}">
-      <span class="nav-icon">🧠</span> Orchestrate Agent
-      <span class="nav-badge">NEW</span>
-    </a>
-    <a href="{{ url_for('agent_page') }}"    class="nav-item {% if active=='agent' %}active{% endif %}">
-      <span class="nav-icon">⚡</span> ReAct Agent
-      <span class="nav-badge">AI</span>
-    </a>
-    <a href="{{ url_for('mentor') }}"        class="nav-item {% if active=='mentor' %}active{% endif %}">
-      <span class="nav-icon">🤖</span> AI Career Mentor
-      <span class="nav-badge">AI</span>
+    <a href="{{ url_for('agent_page') }}"    class="nav-item {% if active=='agent' or active=='orchestrate' or active=='mentor' %}active{% endif %}"
+       style="{% if active=='agent' or active=='orchestrate' or active=='mentor' %}{% else %}background:linear-gradient(90deg,rgba(15,98,254,0.08) 0%,transparent 100%);border-left:3px solid #0f62fe;{% endif %}">
+      <span class="nav-icon">🧠</span> <span style="font-weight:700;">Agentic AI Hub</span>
+      <span class="nav-badge" style="background:#0f62fe;color:#fff;">CORE</span>
     </a>
     <a href="{{ url_for('skill_gap') }}"     class="nav-item {% if active=='skill_gap' %}active{% endif %}">
       <span class="nav-icon">🎯</span> Skill Gap Analysis
@@ -141,25 +134,36 @@
 
 <!-- ══ IBM Watson Orchestrate — Floating Chat Widget ══ -->
 <div id="wxo-chat-root"></div>
+{% if wxo_enabled %}
 <script>
   window.wxOConfiguration = {
-    orchestrationID: "1c1158f96dd549c5ad7f96c4c251cd49_e579e7d6-43d7-47b2-945e-82fb3ec5e41c",
-    hostURL: "https://us-south.watson-orchestrate.cloud.ibm.com",
+    orchestrationID: "{{ wxo_orchestration_id }}",
+    hostURL: "{{ wxo_host_url }}",
     rootElementID: "wxo-chat-root",
     deploymentPlatform: "ibmcloud",
-    crn: "crn:v1:bluemix:public:watsonx-orchestrate:us-south:a/1c1158f96dd549c5ad7f96c4c251cd49:e579e7d6-43d7-47b2-945e-82fb3ec5e41c::",
+    crn: "{{ wxo_crn }}",
     chatOptions: {
-      agentId: "6bd6b080-7ec0-4802-b6ed-84051e332f59",
-      agentEnvironmentId: "fd30e2a6-d90b-4be0-90f4-1bdceb07092d"
+      agentId: "{{ wxo_agent_id }}",
+      agentEnvironmentId: "{{ wxo_agent_env_id }}"
     }
   };
   setTimeout(function () {
     var s = document.createElement('script');
     s.src = window.wxOConfiguration.hostURL + '/wxochat/wxoLoader.js?embed=true';
-    s.addEventListener('load', function () { wxoLoader.init(); });
+    s.onerror = function () {
+      /* Widget failed to load — silently hide the root so there is no blank button */
+      var root = document.getElementById('wxo-chat-root');
+      if (root) root.style.display = 'none';
+    };
+    s.addEventListener('load', function () {
+      if (typeof wxoLoader !== 'undefined') { wxoLoader.init(); }
+    });
     document.head.appendChild(s);
-  }, 0);
+  }, 200);
 </script>
+{% else %}
+<!-- Watson Orchestrate widget disabled: set WXO_AGENT_ID env var to enable -->
+{% endif %}
 
 <script>
 /* ── IBM Granite Model Status — fetch once on page load ── */
