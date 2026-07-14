@@ -1,182 +1,387 @@
 {% extends "base.html" %}
-{% block title %}ReAct Agent — Agentic Career Companion{% endblock %}
-{% block topbar_title %}ReAct Agentic AI{% endblock %}
-{% block content %}
+{% block title %}Agentic AI — Career Companion{% endblock %}
+{% block topbar_title %}Agentic AI Career Counsellor{% endblock %}
 
-<div class="page-header">
-  <h1>&#9889; ReAct Agentic AI &mdash; IBM Granite on watsonx.ai</h1>
-  <p>Watch the agent <strong>Reason &rarr; Act &rarr; Observe &rarr; Repeat</strong> in real time. It autonomously picks tools, calls them in sequence, and synthesises your answer.</p>
-</div>
-
-<div class="alert alert-info" style="margin-bottom:24px;">
-  <span>&#9889;</span>
-  <div>
-    <strong>Powered by IBM Granite 3 8B Instruct &middot; watsonx.ai &middot; IBM Watson Orchestrate</strong><br>
-    Available tools:
-    {% for t in tools %}
-      <span style="display:inline-block;padding:2px 8px;background:#0f62fe22;color:#4589ff;border-radius:10px;font-size:11px;margin:2px;">{{ t }}</span>
-    {% endfor %}
-  </div>
-</div>
-
-<div class="grid grid-2" style="gap:24px;align-items:start;">
-
-  <!-- Chat Panel -->
-  <div>
-    <div class="card" style="display:flex;flex-direction:column;height:580px;">
-      <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">
-        <h3>Agent Chat</h3>
-        <button id="clearBtn" class="btn btn-sm btn-secondary" style="font-size:11px;">Clear Memory</button>
-      </div>
-      <div id="chatMessages" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;">
-        <div class="agent-msg agent-msg--system">
-          <strong>Agent ready.</strong> Ask anything about your career &mdash; the agent will reason through it, call multiple tools, and give you a comprehensive answer.<br><br>
-          Try: <em>"Help me plan my full career in data science"</em><br>
-          Or: <em>"What certifications should I get and how do I prepare for interviews?"</em>
-        </div>
-      </div>
-      <div style="padding:12px;border-top:1px solid var(--border-color);">
-        <div style="display:flex;gap:8px;">
-          <input id="agentInput" type="text" class="form-control" placeholder="Ask the agent anything about your career..." style="flex:1;" />
-          <button id="sendBtn" class="btn btn-primary">Ask Agent</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Reasoning Trace Panel -->
-  <div>
-    <div class="card" style="height:580px;display:flex;flex-direction:column;">
-      <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">
-        <h3>Agent Reasoning Trace</h3>
-        <span id="stepCount" style="font-size:11px;color:var(--text-secondary);">0 tool calls this turn</span>
-      </div>
-      <div id="tracePanel" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;">
-        <p class="text-muted" style="font-size:13px;text-align:center;margin-top:40px;">
-          The agent's thinking will appear here.<br>
-          Each step shows: <strong>Thought &rarr; Action &rarr; Observation</strong>
-        </p>
-      </div>
-    </div>
-
-    <div class="card mt-4">
-      <div class="card-header"><h3>How ReAct Works</h3></div>
-      <div style="padding:16px;font-size:13px;display:flex;flex-direction:column;gap:10px;">
-        <div style="display:flex;gap:10px;align-items:flex-start;">
-          <span style="width:26px;height:26px;border-radius:50%;background:#0f62fe;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;font-size:12px;">1</span>
-          <div><strong>Reason</strong> &mdash; IBM Granite reads your question and decides what it needs to know.</div>
-        </div>
-        <div style="display:flex;gap:10px;align-items:flex-start;">
-          <span style="width:26px;height:26px;border-radius:50%;background:#08bdba;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;font-size:12px;">2</span>
-          <div><strong>Act</strong> &mdash; Calls a tool: skill_gap_analysis, learning_roadmap, certification_advisor, industry_insights, or interview_preparation.</div>
-        </div>
-        <div style="display:flex;gap:10px;align-items:flex-start;">
-          <span style="width:26px;height:26px;border-radius:50%;background:#8a3ffc;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;font-size:12px;">3</span>
-          <div><strong>Observe</strong> &mdash; Tool runs a focused Granite prompt and returns a structured result back to the agent.</div>
-        </div>
-        <div style="display:flex;gap:10px;align-items:flex-start;">
-          <span style="width:26px;height:26px;border-radius:50%;background:#24a148;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;font-size:12px;">4</span>
-          <div><strong>Repeat or Answer</strong> &mdash; Calls more tools if needed (up to 5), then synthesises a final structured answer.</div>
-        </div>
-        <div style="margin-top:4px;padding:10px 12px;background:#0f62fe11;border-radius:6px;border:1px solid #4589ff44;font-size:12px;">
-          This is genuine <strong>Agentic AI</strong>: multi-step reasoning, tool-use, and observation loops built on <strong>IBM Granite &middot; watsonx.ai &middot; Watson Orchestrate</strong>.
-        </div>
-      </div>
-    </div>
-  </div>
-
-</div>
-
+{% block head %}
 <style>
-.agent-msg{padding:12px 14px;border-radius:8px;font-size:13px;line-height:1.65;}
-.agent-msg--user{background:#0f62fe22;border-left:3px solid #4589ff;margin-left:15%;}
-.agent-msg--agent{background:var(--bg-secondary);border-left:3px solid #24a148;}
-.agent-msg--system{background:#8a3ffc11;border-left:3px solid #8a3ffc;color:var(--text-secondary);}
-.agent-msg--thinking{background:#08bdba11;border-left:3px solid #08bdba;color:var(--text-secondary);font-style:italic;}
-.trace-step{border:1px solid var(--border-color);border-radius:8px;overflow:hidden;font-size:12px;}
-.trace-step-header{padding:8px 12px;background:var(--bg-secondary);font-weight:600;display:flex;gap:8px;align-items:center;}
-.trace-thought{padding:8px 12px;border-top:1px solid var(--border-color);}
-.trace-action{padding:8px 12px;border-top:1px solid var(--border-color);background:#0f62fe08;}
-.trace-obs{padding:8px 12px;border-top:1px solid var(--border-color);background:#24a14808;max-height:130px;overflow-y:auto;white-space:pre-wrap;}
-.trace-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-secondary);margin-bottom:3px;}
+/* ════ Hero Banner ═══════════════════════════════════════════ */
+.agent-hero{background:linear-gradient(135deg,#0f62fe 0%,#7c3aed 100%);border-radius:12px;padding:22px 28px;color:#fff;margin-bottom:0;}
+.agent-hero h1{font-size:20px;font-weight:700;margin:0 0 4px;}
+.agent-hero p{font-size:12.5px;opacity:.88;margin:0 0 12px;line-height:1.6;}
+.hero-pills{display:flex;flex-wrap:wrap;gap:6px;}
+.hero-pill{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);border-radius:20px;padding:2px 10px;font-size:11px;font-weight:600;}
+/* ════ Tabs ══════════════════════════════════════════════════ */
+.hub-tabs{display:flex;gap:2px;border-bottom:2px solid var(--border-color);margin:20px 0 22px;}
+.hub-tab{padding:9px 18px;border:none;background:transparent;cursor:pointer;font-size:13px;font-weight:600;color:var(--text-secondary);border-bottom:3px solid transparent;margin-bottom:-2px;border-radius:6px 6px 0 0;transition:color .15s;display:flex;align-items:center;gap:7px;font-family:inherit;}
+.hub-tab:hover{color:var(--text-primary);background:var(--bg-secondary);}
+.hub-tab.active{color:#0f62fe;border-bottom-color:#0f62fe;background:rgba(15,98,254,.05);}
+.tab-pill{background:#0f62fe;color:#fff;border-radius:20px;padding:1px 7px;font-size:10px;font-weight:700;}
+.hub-pane{display:none;} .hub-pane.active{display:block;}
+/* ════ Sub-agent status chips ════════════════════════════════ */
+.sa-grid{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:18px;}
+.sa-chip{display:flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;font-size:11.5px;font-weight:600;border:1.5px solid;transition:all .3s;}
+.sa-chip.idle{background:var(--bg-secondary);border-color:var(--border-color);color:var(--text-secondary);}
+.sa-chip.running{background:#0f62fe18;border-color:#0f62fe;color:#0f62fe;animation:sapulse .9s infinite;}
+.sa-chip.done{background:#24a14818;border-color:#24a148;color:#24a148;}
+@keyframes sapulse{0%,100%{opacity:1}50%{opacity:.45}}
+/* ════ Agent messages ════════════════════════════════════════ */
+.am{padding:11px 14px;border-radius:8px;font-size:13px;line-height:1.65;margin-bottom:2px;}
+.am-user{background:#0f62fe18;border-left:3px solid #4589ff;margin-left:10%;}
+.am-bot{background:var(--bg-secondary);border-left:3px solid #24a148;}
+.am-sys{background:#8a3ffc11;border-left:3px solid #8a3ffc;color:var(--text-secondary);}
+.am-think{background:#08bdba11;border-left:3px solid #08bdba;color:var(--text-secondary);font-style:italic;}
+/* ════ Trace steps ═══════════════════════════════════════════ */
+.ts{border:1px solid var(--border-color);border-radius:8px;overflow:hidden;font-size:12px;margin-bottom:7px;}
+.ts-hdr{padding:7px 12px;background:var(--bg-secondary);font-weight:600;display:flex;gap:8px;align-items:center;}
+.ts-t,.ts-a,.ts-o{padding:7px 12px;border-top:1px solid var(--border-color);}
+.ts-a{background:#0f62fe06;} .ts-o{background:#24a14806;max-height:110px;overflow-y:auto;white-space:pre-wrap;}
+.ts-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-secondary);margin-bottom:2px;}
+/* ════ Mentor chat ═══════════════════════════════════════════ */
+.mentor-wrap{display:grid;grid-template-columns:1fr 255px;height:560px;border:1px solid var(--border-color);border-radius:10px;overflow:hidden;}
+.chat-col{display:flex;flex-direction:column;overflow:hidden;background:var(--bg-card);border-right:1px solid var(--border-color);}
+.chat-hdr{background:linear-gradient(135deg,#0f62fe,#7c3aed);padding:11px 18px;color:#fff;display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.chat-ico{width:32px;height:32px;background:rgba(255,255,255,.2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;}
+.mbadge{margin-left:auto;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.3);color:#fff;font-size:11px;padding:2px 9px;border-radius:20px;font-weight:600;}
+.msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:12px;min-height:0;}
+.msgs::-webkit-scrollbar{width:4px;} .msgs::-webkit-scrollbar-thumb{background:var(--border-color);border-radius:2px;}
+.msg{display:flex;gap:8px;align-items:flex-start;max-width:88%;animation:mi .2s ease;}
+@keyframes mi{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.msg.user{align-self:flex-end;flex-direction:row-reverse;} .msg.bot,.msg.err{align-self:flex-start;}
+.mav{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+.msg.user .mav{background:#0f62fe;color:#fff;font-size:11px;font-weight:700;}
+.msg.bot .mav{background:linear-gradient(135deg,#0f62fe,#7c3aed);color:#fff;}
+.msg.err .mav{background:#da1e28;color:#fff;}
+.mbub{padding:9px 13px;border-radius:11px;font-size:13px;line-height:1.6;word-break:break-word;}
+.msg.user .mbub{background:#0f62fe;color:#fff;border-bottom-right-radius:3px;}
+.msg.bot .mbub{background:var(--bg-secondary);border:1px solid var(--border-color);border-bottom-left-radius:3px;}
+.msg.err .mbub{background:rgba(218,30,40,.08);color:#da1e28;border:1px solid rgba(218,30,40,.2);}
+.mbub strong{font-weight:700;} .mbub ul,.mbub ol{margin:5px 0 5px 16px;} .mbub li{margin-bottom:2px;} .mbub p{margin:0 0 5px;} .mbub p:last-child{margin:0;}
+.tbub{display:flex;align-items:center;gap:4px;padding:10px 13px;}
+.tbub span{width:6px;height:6px;background:var(--text-muted);border-radius:50%;animation:bn 1.2s infinite;}
+.tbub span:nth-child(2){animation-delay:.2s;} .tbub span:nth-child(3){animation-delay:.4s;}
+@keyframes bn{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
+.cinput{padding:11px 14px;border-top:1px solid var(--border-color);background:var(--bg-card);flex-shrink:0;}
+.crow{display:flex;gap:7px;align-items:flex-end;}
+#mtxt{flex:1;resize:none;padding:9px 13px;font-size:13px;border:1.5px solid var(--border-color);border-radius:10px;background:var(--bg-secondary);color:var(--text-primary);font-family:inherit;line-height:1.5;max-height:88px;overflow-y:auto;transition:border-color .15s;outline:none;}
+#mtxt:focus{border-color:#0f62fe;background:var(--bg-card);}
+#msend{width:38px;height:38px;border-radius:10px;background:#0f62fe;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff;flex-shrink:0;transition:background .15s;}
+#msend:hover{background:#0353e9;} #msend:disabled{background:var(--border-color);cursor:not-allowed;}
+.sbar{overflow-y:auto;padding:10px;background:var(--bg-secondary);display:flex;flex-direction:column;gap:7px;}
+.sc{background:var(--bg-card);border:1px solid var(--border-color);border-radius:8px;padding:10px;}
+.sc-t{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-secondary);margin-bottom:7px;}
+.sqb{width:100%;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:6px;padding:6px 8px;margin-bottom:3px;text-align:left;cursor:pointer;font-size:11px;color:var(--text-primary);display:flex;align-items:flex-start;gap:5px;transition:all .15s;font-family:inherit;line-height:1.4;}
+.sqb:hover{border-color:#0f62fe;background:rgba(15,98,254,.04);color:#0f62fe;}
+.chip{background:var(--bg-card);border:1px solid var(--border-color);border-radius:20px;padding:4px 11px;font-size:11.5px;cursor:pointer;color:var(--text-primary);font-family:inherit;transition:all .15s;}
+.chip:hover{border-color:#0f62fe;color:#0f62fe;background:rgba(15,98,254,.04);}
+.wcard{background:linear-gradient(135deg,rgba(15,98,254,.06),rgba(124,58,237,.06));border:1px solid rgba(15,98,254,.15);border-radius:11px;padding:16px;text-align:center;}
+.chip-row{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;margin-top:9px;}
+@media(max-width:860px){.mentor-wrap{grid-template-columns:1fr;height:auto;} .sbar{max-height:28vh;}}
 </style>
 {% endblock %}
+
+{% block content %}
+<div class="agent-hero">
+  <h1>&#129504; Agentic Career Counselling AI</h1>
+  <p>A single autonomous orchestrator agent continuously monitors your academic profile, evolving interests, and real-time labor market trends — dispatching specialised sub-agents to deliver tailored, future-ready career pathway suggestions with zero manual intervention.</p>
+  <div class="hero-pills">
+    <span class="hero-pill">IBM Granite 3 8B Instruct</span>
+    <span class="hero-pill">watsonx.ai</span>
+    <span class="hero-pill">Watson Orchestrate</span>
+    <span class="hero-pill">ReAct Orchestration</span>
+    <span class="hero-pill">7 Sub-Agents</span>
+    <span class="hero-pill">IBM Cloud Lite</span>
+  </div>
+</div>
+
+<div class="hub-tabs" id="hubTabs">
+  <button class="hub-tab active" data-pane="pane-orch">&#9889; Orchestrator Agent <span class="tab-pill">MAIN</span></button>
+  <button class="hub-tab" data-pane="pane-wxo">&#129504; Watson Orchestrate <span class="tab-pill">LIVE</span></button>
+  <button class="hub-tab" data-pane="pane-mentor">&#129302; Career Mentor <span class="tab-pill">AI</span></button>
+</div>
+
+<!-- ════ TAB 1 — Orchestrator ══════════════════════════════════ -->
+<div class="hub-pane active" id="pane-orch">
+  <div class="sa-grid" id="saGrid">
+    {% for sid,icon,label in [
+      ("skill_gap_analysis","&#127919;","Skill Gap"),("learning_roadmap","&#128279;","Roadmap"),
+      ("certification_advisor","&#127942;","Certifications"),("industry_insights","&#127760;","Industry"),
+      ("interview_preparation","&#127908;","Interview"),("career_pathway_monitor","&#129488;","Pathways"),
+      ("labor_market_scan","&#128202;","Market Scan")] %}
+    <div class="sa-chip idle" id="sa-{{sid}}">{{icon}} {{label}}</div>
+    {% endfor %}
+  </div>
+  <div class="grid grid-2" style="gap:22px;align-items:start;">
+    <div>
+      <div class="card" style="display:flex;flex-direction:column;height:520px;">
+        <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">
+          <div><h3 style="margin:0;">Orchestrator Chat</h3><div style="font-size:11px;color:var(--text-secondary);margin-top:2px;">IBM Granite &bull; watsonx.ai &bull; Watson Orchestrate</div></div>
+          <button id="clearBtn" class="btn btn-sm btn-secondary" style="font-size:11px;">Clear Memory</button>
+        </div>
+        <div id="chatMessages" style="flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;">
+          <div class="am am-sys">
+            <strong>Main Orchestrator Agent ready.</strong><br>
+            I autonomously monitor your profile, scan the labor market, and dispatch the right sub-agents to build your personalised career plan.<br><br>
+            {% if profile.profile_complete %}&#10003; Profile loaded for <strong>{{profile.full_name}}</strong>. Responses will be fully personalised.<br><br>{% else %}&#9888; <a href="{{url_for('profile')}}">Complete your profile</a> for personalised recommendations.<br><br>{% endif %}
+            Try: <em>"Analyse my full career situation and give me a complete plan."</em><br>
+            Or: <em>"What career path should I take given my background?"</em>
+          </div>
+        </div>
+        <div style="padding:11px;border-top:1px solid var(--border-color);">
+          <div style="display:flex;gap:7px;">
+            <input id="agentInput" type="text" class="form-control" placeholder="Ask the orchestrator anything about your career…" style="flex:1;font-size:13px;"/>
+            <button id="sendBtn" class="btn btn-primary" style="font-size:13px;">Ask Agent</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="card" style="height:520px;display:flex;flex-direction:column;">
+        <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">
+          <h3 style="margin:0;">Sub-Agent Execution Trace</h3>
+          <span id="stepCount" style="font-size:11px;color:var(--text-secondary);">0 sub-agents called</span>
+        </div>
+        <div id="tracePanel" style="flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:6px;">
+          <p class="text-muted" style="font-size:13px;text-align:center;margin-top:30px;">Sub-agent calls appear here in real time.<br><strong>Thought &rarr; Sub-Agent Called &rarr; Output</strong></p>
+        </div>
+      </div>
+      <div class="card mt-4">
+        <div class="card-header"><h3>Agent Architecture</h3></div>
+        <div style="padding:14px;">
+          <div style="padding:9px 12px;background:rgba(15,98,254,.06);border-left:3px solid #0f62fe;border-radius:6px;font-size:12.5px;margin-bottom:10px;">
+            <strong>ORCHESTRATOR</strong> &mdash; IBM Granite on Watson Orchestrate<br>
+            <span class="text-muted">Receives user intent &rarr; plans sub-agent sequence &rarr; synthesises final personalised answer</span>
+          </div>
+          <div style="text-align:center;color:var(--text-secondary);margin-bottom:8px;">&#8595; dispatches &darr;</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;font-size:11.5px;">
+            {% for icon,label,col in [
+              ("&#127919;","Skill Gap Sub-Agent","#4589ff"),("&#128279;","Roadmap Sub-Agent","#08bdba"),
+              ("&#127942;","Certs Sub-Agent","#8a3ffc"),("&#127760;","Industry Sub-Agent","#24a148"),
+              ("&#127908;","Interview Sub-Agent","#ff832b"),("&#129488;","Pathway Sub-Agent","#da1e28"),
+              ("&#128202;","Market Sub-Agent","#6929c4")] %}
+            <div style="padding:6px 9px;background:var(--bg-secondary);border-radius:5px;border-left:2px solid {{col}};">{{icon}} {{label}}</div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ TAB 2 — Watson Orchestrate ═══════════════════════════ -->
+<div class="hub-pane" id="pane-wxo">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px;">
+    <div class="card">
+      <div class="card-header"><h3>&#129504; Watson Orchestrate Agent</h3></div>
+      <div style="padding:14px;font-size:13px;display:flex;flex-direction:column;gap:10px;">
+        <div style="padding:10px;background:rgba(15,98,254,.06);border-radius:8px;border:1px solid rgba(15,98,254,.2);font-size:12.5px;line-height:1.6;">
+          IBM Watson Orchestrate hosts this career agent in the cloud. It uses IBM Granite as its reasoning core and the same sub-agent tools — delivering enterprise-grade session memory, autonomous multi-skill chaining, and persistent conversation across turns.
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px;font-size:12.5px;">
+          <div style="display:flex;align-items:center;gap:9px;padding:8px 11px;background:var(--bg-secondary);border-radius:6px;border-left:3px solid #4589ff;"><span>&#127758;</span><div><strong>IBM Watson Orchestrate</strong><br><span class="text-muted" style="font-size:11px;">us-south &bull; ibmcloud</span></div></div>
+          <div style="text-align:center;color:var(--text-secondary);">&#8597;</div>
+          <div style="display:flex;align-items:center;gap:9px;padding:8px 11px;background:var(--bg-secondary);border-radius:6px;border-left:3px solid #08bdba;"><span>&#129302;</span><div><strong>IBM Granite 3 8B Instruct</strong><br><span class="text-muted" style="font-size:11px;">watsonx.ai reasoning core</span></div></div>
+          <div style="text-align:center;color:var(--text-secondary);">&#8597;</div>
+          <div style="display:flex;align-items:center;gap:9px;padding:8px 11px;background:var(--bg-secondary);border-radius:6px;border-left:3px solid #8a3ffc;"><span>&#128295;</span><div><strong>Career Sub-Agent Tools</strong><br><span class="text-muted" style="font-size:11px;">Skill gap &bull; Roadmap &bull; Certs &bull; Market &bull; Pathways</span></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h3>How to Use the Live Widget</h3></div>
+      <div style="padding:14px;font-size:13px;display:flex;flex-direction:column;gap:10px;">
+        {% for n,col,text in [
+          ("1","#0f62fe","Click the <strong>blue chat bubble</strong> in the bottom-right corner of any page on this site."),
+          ("2","#08bdba","Type your career question. The Orchestrate agent will reason, select tools, and reply autonomously."),
+          ("3","#8a3ffc","Continue the conversation — the Orchestrate runtime keeps memory across turns.")] %}
+        <div style="display:flex;align-items:flex-start;gap:10px;">
+          <span style="width:24px;height:24px;border-radius:50%;background:{{col}};color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;font-size:11px;">{{n}}</span>
+          <div>{{text}}</div>
+        </div>
+        {% endfor %}
+        <div style="background:var(--bg-secondary);border-radius:8px;padding:12px;font-size:12.5px;">
+          <strong>Sample prompts:</strong>
+          <ul style="margin:6px 0 0 16px;display:flex;flex-direction:column;gap:3px;">
+            <li>What career path suits my profile best?</li>
+            <li>Give me a 3-month personalised learning roadmap.</li>
+            <li>Which IBM certification should I start with?</li>
+            <li>What are the hottest jobs in AI in 2025?</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="background:var(--bg-secondary);border:2px dashed var(--border-color);border-radius:10px;min-height:200px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:24px;text-align:center;">
+    <div style="font-size:34px;">&#128172;</div>
+    <div style="font-size:15px;font-weight:700;color:var(--text-primary);">Watson Orchestrate Chat is Live</div>
+    <div style="font-size:13px;color:var(--text-secondary);max-width:420px;line-height:1.7;">
+      The IBM Watson Orchestrate agent is embedded on <strong>every page</strong> of this app via the floating chat button in the <strong>bottom-right corner</strong>. It is always available — no need to stay on this tab.
+    </div>
+    <button id="openWxoBtn" class="btn btn-primary" style="font-size:13px;margin-top:4px;">&#128172; Open Orchestrate Chat Now</button>
+    <div style="font-size:11px;color:var(--text-secondary);">Model: IBM Granite 3 8B &bull; Region: us-south &bull; Platform: ibmcloud</div>
+  </div>
+</div>
+
+<!-- ════ TAB 3 — Career Mentor ════════════════════════════════ -->
+<div class="hub-pane" id="pane-mentor">
+  <div class="mentor-wrap">
+    <div class="chat-col">
+      <div class="chat-hdr">
+        <div class="chat-ico">&#129302;</div>
+        <div><div style="font-weight:700;font-size:13px;line-height:1.2;">AI Career Mentor</div><div style="font-size:11px;opacity:.8;">IBM Granite &bull; watsonx.ai</div></div>
+        <span class="mbadge">&#129002; granite-3-8b</span>
+      </div>
+      <div class="msgs" id="mentorMsgs">
+        <div class="wcard" id="mwelcome">
+          <div style="font-size:26px;margin-bottom:6px;">&#127891;</div>
+          <div style="font-size:14px;font-weight:700;">Career Mentor Ready</div>
+          <div style="font-size:12.5px;color:var(--text-secondary);margin-top:4px;">Quick free-form chat with IBM Granite. For multi-step agentic reasoning, use the Orchestrator tab.</div>
+          {% if profile.profile_complete %}<div style="font-size:11.5px;color:var(--text-muted);margin-top:8px;">&#10003; Personalised for <strong>{{profile.full_name}}</strong></div>{% else %}<div style="font-size:11.5px;color:#ff832b;margin-top:8px;">&#9888; <a href="{{url_for('profile')}}" style="color:#ff832b;">Complete profile</a> for personalised answers</div>{% endif %}
+          <div class="chip-row">{% for q in ["Which career suits me?","Skills to learn next?","Best certification?","How to get an internship?","Portfolio project ideas?","Crack tech interviews?"] %}<button class="chip" onclick="mc('{{q}}')">{{q}}</button>{% endfor %}</div>
+        </div>
+      </div>
+      <div class="cinput">
+        <div class="crow"><textarea id="mtxt" placeholder="Ask about careers, skills, certifications, interviews…" rows="1"></textarea><button id="msend" onclick="ms()">&#10148;</button></div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:4px;"><kbd style="background:var(--bg-secondary);border:1px solid var(--border-color);padding:0 4px;border-radius:3px;font-size:10px;">Enter</kbd> send &nbsp;&middot;&nbsp;<kbd style="background:var(--bg-secondary);border:1px solid var(--border-color);padding:0 4px;border-radius:3px;font-size:10px;">Shift+Enter</kbd> newline<span style="float:right;color:#0f62fe;font-weight:600;">IBM Granite &#10022;</span></div>
+      </div>
+    </div>
+    <div class="sbar">
+      {% if profile.profile_complete %}
+      <div class="sc">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;"><span class="sc-t" style="margin:0;">Profile</span><span style="background:rgba(36,161,72,.1);color:#24a148;border-radius:20px;padding:2px 6px;font-size:10px;font-weight:600;">Loaded</span></div>
+        <div style="font-size:11px;color:var(--text-secondary);display:flex;flex-direction:column;gap:3px;">
+          <div style="display:flex;justify-content:space-between;"><span>Name</span><strong style="color:var(--text-primary);">{{profile.full_name}}</strong></div>
+          <div style="display:flex;justify-content:space-between;"><span>Branch</span><strong style="color:var(--text-primary);">{{profile.branch or '—'}}</strong></div>
+          <div style="display:flex;justify-content:space-between;"><span>CGPA</span><strong style="color:var(--text-primary);">{{profile.cgpa or '—'}}</strong></div>
+          <div style="display:flex;justify-content:space-between;"><span>Goal</span><strong style="color:var(--text-primary);">{{profile.preferred_industry or '—'}}</strong></div>
+        </div>
+        {% if profile.skills %}<div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:3px;">{% for s in profile.skills[:4] %}<span style="background:rgba(36,161,72,.08);color:#24a148;border-radius:20px;padding:2px 7px;font-size:10px;">{{s}}</span>{% endfor %}{% if profile.skills|length>4 %}<span style="background:var(--bg-secondary);color:var(--text-muted);border-radius:20px;padding:2px 6px;font-size:10px;">+{{profile.skills|length-4}}</span>{% endif %}</div>{% endif %}
+      </div>
+      {% else %}
+      <div class="sc"><div class="sc-t">Get Personalised Advice</div><p style="font-size:11px;color:var(--text-secondary);margin-bottom:8px;line-height:1.5;">Complete your profile for advice specific to your skills and goals.</p><a href="{{url_for('profile')}}" class="btn btn-primary btn-sm" style="width:100%;justify-content:center;font-size:11px;">Create Profile &rarr;</a></div>
+      {% endif %}
+      <div class="sc"><div class="sc-t">Quick Questions</div>
+        {% for icon,q in [("&#127919;","Which career path suits my profile best?"),("&#128218;","What skills should I learn next?"),("&#127942;","Which IBM or AWS certification first?"),("&#127970;","How do I land my first tech internship?"),("&#128161;","What projects should I build for my portfolio?"),("&#127908;","How do I prepare for technical interviews?"),("&#127760;","Top technologies to learn in 2025?"),("&#128200;","Highest-paying AI jobs in 2025?")] %}
+        <button class="sqb" onclick="mc('{{q|replace(&quot;'&quot;,&quot;\\'&quot;)}}')"><span>{{icon}}</span><span>{{q}}</span></button>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
 {% block scripts %}
 <script>
+/* Tab switching */
+document.getElementById('hubTabs').addEventListener('click',function(e){
+  var b=e.target.closest('.hub-tab'); if(!b)return;
+  document.querySelectorAll('.hub-tab').forEach(function(t){t.classList.remove('active');});
+  document.querySelectorAll('.hub-pane').forEach(function(p){p.classList.remove('active');});
+  b.classList.add('active');
+  var p=document.getElementById(b.dataset.pane); if(p)p.classList.add('active');
+});
+
+/* Open Orchestrate widget button */
+document.getElementById('openWxoBtn').addEventListener('click',function(){
+  var btn=document.querySelector('#wxo-chat-root button')||document.querySelector('[class*="wxo"] button')||document.querySelector('[class*="WatsonAssistant"] button');
+  if(btn){btn.click();}else{alert('Watson Orchestrate widget is loading — try clicking the blue bubble in the bottom-right corner.');}
+});
+
+/* Sub-agent chip state */
+function saReset(){document.querySelectorAll('.sa-chip').forEach(function(c){c.className='sa-chip idle';});}
+function saRun(n){var e=document.getElementById('sa-'+n);if(e)e.className='sa-chip running';}
+function saDone(n){var e=document.getElementById('sa-'+n);if(e)e.className='sa-chip done';}
+
+/* ═══ Orchestrator Agent ═══════════════════════════════════ */
 (function(){
-  var chatEl=document.getElementById('chatMessages');
-  var traceEl=document.getElementById('tracePanel');
-  var inputEl=document.getElementById('agentInput');
-  var sendBtn=document.getElementById('sendBtn');
-  var clearBtn=document.getElementById('clearBtn');
-  var stepCount=document.getElementById('stepCount');
+  var CE=document.getElementById('chatMessages'),TE=document.getElementById('tracePanel'),
+      IE=document.getElementById('agentInput'),SB=document.getElementById('sendBtn'),
+      CB=document.getElementById('clearBtn'),SC=document.getElementById('stepCount');
 
-  function addMsg(html,cls){
-    var d=document.createElement('div');
-    d.className='agent-msg '+cls;
-    d.innerHTML=html;
-    chatEl.appendChild(d);
-    chatEl.scrollTop=chatEl.scrollHeight;
-    return d;
-  }
+  function addMsg(h,c){var d=document.createElement('div');d.className='am '+c;d.innerHTML=h;CE.appendChild(d);CE.scrollTop=CE.scrollHeight;return d;}
 
-  function renderTrace(trace){
-    traceEl.innerHTML='';
-    if(!trace||trace.length===0){
-      traceEl.innerHTML='<p class="text-muted" style="font-size:13px;text-align:center;margin-top:40px;">No tools called &mdash; agent answered from reasoning alone.</p>';
-      return;
-    }
-    trace.forEach(function(t){
-      var div=document.createElement('div');
-      div.className='trace-step';
-      div.innerHTML=
-        '<div class="trace-step-header">'+
-          '<span style="background:#0f62fe;color:#fff;padding:2px 8px;border-radius:10px;font-size:11px;">Step '+t.step+'</span>'+
-          '<span style="color:#4589ff;font-size:12px;">'+(t.action||'')+'</span>'+
-        '</div>'+
-        '<div class="trace-thought"><div class="trace-label">Thought</div>'+(t.thought||'(none)')+'</div>'+
-        '<div class="trace-action"><div class="trace-label">Action &rarr; Tool Called</div><strong>'+(t.action||'')+'</strong></div>'+
-        '<div class="trace-obs"><div class="trace-label">Observation (Tool Output)</div>'+(t.observation||'')+'</div>';
-      traceEl.appendChild(div);
+  function renderTrace(tr){
+    TE.innerHTML='';
+    if(!tr||!tr.length){TE.innerHTML='<p class="text-muted" style="font-size:13px;text-align:center;margin-top:30px;">No sub-agents called — answered from reasoning alone.</p>';return;}
+    tr.forEach(function(t){
+      saDone(t.action);
+      var d=document.createElement('div');d.className='ts';
+      d.innerHTML='<div class="ts-hdr"><span style="background:#0f62fe;color:#fff;padding:2px 8px;border-radius:10px;font-size:11px;">Step '+t.step+'</span><span style="color:#4589ff;font-size:12px;font-weight:600;">'+(t.action||'')+'</span></div>'+
+        '<div class="ts-t"><div class="ts-lbl">Orchestrator Thought</div>'+(t.thought||'(none)')+'</div>'+
+        '<div class="ts-a"><div class="ts-lbl">Sub-Agent Called</div><strong>'+(t.action||'')+'</strong></div>'+
+        '<div class="ts-o"><div class="ts-lbl">Sub-Agent Output</div>'+(t.observation||'')+'</div>';
+      TE.appendChild(d);
     });
-    traceEl.scrollTop=traceEl.scrollHeight;
+    TE.scrollTop=TE.scrollHeight;
   }
 
-  function sendMessage(){
-    var msg=inputEl.value.trim();
-    if(!msg)return;
-    inputEl.value='';
-    sendBtn.disabled=true;
-    sendBtn.textContent='Thinking\u2026';
-    addMsg(msg,'agent-msg--user');
-    var thinking=addMsg('&#9889; Agent is reasoning and calling tools\u2026','agent-msg--thinking');
-    traceEl.innerHTML='<p class="text-muted" style="font-size:13px;text-align:center;margin-top:20px;">Agent is working\u2026</p>';
-
-    fetch('/api/agent-chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg})})
-    .then(function(r){return r.json();})
-    .then(function(d){
-      chatEl.removeChild(thinking);
-      if(d.ok){
-        addMsg((d.answer||'').replace(/\n/g,'<br>'),'agent-msg--agent');
-        renderTrace(d.trace);
-        var n=d.steps||0;
-        stepCount.textContent=n+' tool call'+(n===1?'':'s')+' this turn';
-      } else {
-        addMsg('<strong>Error:</strong> '+(d.answer||d.result||'Unknown error'),'agent-msg--system');
-      }
-    })
-    .catch(function(err){chatEl.removeChild(thinking);addMsg('<strong>Network error:</strong> '+err,'agent-msg--system');})
-    .finally(function(){sendBtn.disabled=false;sendBtn.textContent='Ask Agent';inputEl.focus();});
+  function send(){
+    var m=IE.value.trim();if(!m)return;
+    IE.value='';SB.disabled=true;SB.textContent='Thinking\u2026';
+    saReset();
+    addMsg(m,'am-user');
+    var th=addMsg('&#9889; Orchestrator is reasoning and dispatching sub-agents\u2026','am-think');
+    TE.innerHTML='<p class="text-muted" style="font-size:13px;text-align:center;margin-top:20px;">Sub-agent calls will appear here\u2026</p>';
+    fetch('/api/agent-chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:m})})
+      .then(function(r){return r.json();})
+      .then(function(d){
+        CE.removeChild(th);
+        if(d.ok){
+          if(d.trace)d.trace.forEach(function(t){saRun(t.action);});
+          addMsg((d.answer||'').replace(/\n/g,'<br>'),'am-bot');
+          renderTrace(d.trace);
+          var n=d.steps||0;SC.textContent=n+' sub-agent'+(n===1?'':'s')+' called';
+        }else{addMsg('<strong>Error:</strong> '+(d.answer||d.result||'Unknown error'),'am-sys');}
+      })
+      .catch(function(err){CE.removeChild(th);addMsg('<strong>Network error:</strong> '+err,'am-sys');})
+      .finally(function(){SB.disabled=false;SB.textContent='Ask Agent';IE.focus();});
   }
-
-  sendBtn.addEventListener('click',sendMessage);
-  inputEl.addEventListener('keydown',function(e){if(e.key==='Enter')sendMessage();});
-  clearBtn.addEventListener('click',function(){
+  SB.addEventListener('click',send);
+  IE.addEventListener('keydown',function(e){if(e.key==='Enter')send();});
+  CB.addEventListener('click',function(){
     fetch('/api/agent-history/clear',{method:'POST'});
-    chatEl.innerHTML='<div class="agent-msg agent-msg--system">Memory cleared. Start a new conversation.</div>';
-    traceEl.innerHTML='<p class="text-muted" style="font-size:13px;text-align:center;margin-top:40px;">Reasoning trace will appear here.</p>';
-    stepCount.textContent='0 tool calls this turn';
+    CE.innerHTML='<div class="am am-sys">Memory cleared. Start a fresh conversation.</div>';
+    TE.innerHTML='<p class="text-muted" style="font-size:13px;text-align:center;margin-top:30px;">Trace will appear here.</p>';
+    SC.textContent='0 sub-agents called';saReset();
   });
 }());
+
+/* ═══ Career Mentor ════════════════════════════════════════ */
+var _mb=false,_mt=document.getElementById('mtxt');
+if(_mt){
+  _mt.addEventListener('input',function(){this.style.height='auto';this.style.height=Math.min(this.scrollHeight,88)+'px';});
+  _mt.addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();ms();}});
+}
+function mc(q){if(_mb)return;var w=document.getElementById('mwelcome');if(w)w.style.display='none';_mr(q);}
+function ms(){var t=_mt.value.trim();if(!t||_mb)return;_mt.value='';_mt.style.height='auto';var w=document.getElementById('mwelcome');if(w)w.style.display='none';_mr(t);}
+function _mr(text){
+  _mb=true;document.getElementById('msend').disabled=true;
+  _ma('user',_me(text));var tid=_mty();
+  fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:text})})
+    .then(function(r){return r.json();})
+    .then(function(d){_mrt(tid);if(d.ok)_ma('bot',_mf(d.result));else _ma('err','&#9888; '+_me(d.result));})
+    .catch(function(){_mrt(tid);_ma('err','&#9888; Could not reach the server.');})
+    .finally(function(){_mb=false;document.getElementById('msend').disabled=false;_mt&&_mt.focus();});
+}
+function _ma(r,h){
+  var b=document.getElementById('mentorMsgs');
+  var av=r==='user'?'{{ profile.full_name[0] if profile.profile_complete and profile.full_name else "U" }}':(r==='err'?'&#9888;':'&#129302;');
+  var d=document.createElement('div');d.className='msg '+r;
+  d.innerHTML='<div class="mav">'+av+'</div><div class="mbub">'+h+'</div>';
+  b.appendChild(d);b.scrollTop=b.scrollHeight;
+}
+function _mty(){
+  var b=document.getElementById('mentorMsgs'),id='t'+Date.now(),d=document.createElement('div');
+  d.className='msg bot';d.id=id;d.innerHTML='<div class="mav">&#129302;</div><div class="mbub"><div class="tbub"><span></span><span></span><span></span></div></div>';
+  b.appendChild(d);b.scrollTop=b.scrollHeight;return id;
+}
+function _mrt(id){var e=document.getElementById(id);if(e)e.remove();}
+function _mf(text){
+  var s=_me(text);
+  s=s.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
+  s=s.replace(/^(\d+)\.\s+(.+)$/gm,'<li>$2</li>');
+  s=s.replace(/^[-\u2022]\s+(.+)$/gm,'<li>$1</li>');
+  s=s.replace(/`([^`]+)`/g,'<code style="background:rgba(0,0,0,.08);padding:1px 4px;border-radius:3px;font-size:11.5px;">$1</code>');
+  return s.split(/\n{2,}/).map(function(p){p=p.trim();if(!p)return'';if(p.includes('<li>'))return'<ul>'+p+'</ul>';return'<p>'+p.replace(/\n/g,'<br>')+'</p>';}).join('')||_me(text);
+}
+function _me(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 </script>
 {% endblock %}
