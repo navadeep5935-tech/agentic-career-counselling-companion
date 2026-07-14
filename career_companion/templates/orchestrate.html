@@ -1,20 +1,20 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
 {% block title %}Watson Orchestrate Agent — Agentic Career Companion{% endblock %}
 {% block topbar_title %}IBM Watson Orchestrate Agent{% endblock %}
 {% block content %}
 
 <div class="page-header">
   <h1>&#129504; IBM Watson Orchestrate Agent</h1>
-  <p>Your career guidance is powered by a live IBM Watson Orchestrate agent &mdash; an autonomous AI that reasons, plans, and acts on your behalf.</p>
+  <p>Your career guidance is powered by a live IBM Watson Orchestrate agent &mdash; an autonomous AI that reasons, plans, and acts on your behalf using IBM Granite on watsonx.ai.</p>
 </div>
 
 <div class="alert alert-info" style="margin-bottom:24px;">
-  <span>&#10022;</span>
+  <span>&#9679;</span>
   <div>
-    <strong>Live Watson Orchestrate Instance</strong> &mdash;
-    Agent ID: <code>6bd6b080-7ec0-4802-b6ed-84051e332f59</code> &nbsp;|&nbsp;
-    Environment: <code>fd30e2a6-d90b-4be0-90f4-1bdceb07092d</code> &nbsp;|&nbsp;
-    Region: <code>us-south</code>
+    <strong>Watson Orchestrate Agent: Active</strong> &mdash;
+    Model: <code>IBM Granite 3 8B Instruct</code> &nbsp;|&nbsp;
+    Region: <code>us-south</code> &nbsp;|&nbsp;
+    Platform: <code>ibmcloud</code>
   </div>
 </div>
 
@@ -75,13 +75,6 @@
         <p class="text-muted" style="font-size:13px;margin-bottom:16px;">
           The Watson Orchestrate agent is embedded on every page via the floating chat button in the <strong>bottom-right corner</strong>. Click it to start chatting.
         </p>
-        <div style="background:var(--bg-secondary);border-radius:8px;padding:14px;font-size:12px;font-family:monospace;line-height:1.9;border:1px solid var(--border-color);margin-bottom:16px;">
-          <div><span style="color:#8d8d8d;">orchestrationID &nbsp;</span><span style="color:#4589ff;">1c1158f96dd549c5&#8230;_e579e7d6&#8230;</span></div>
-          <div><span style="color:#8d8d8d;">agentId &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color:#08bdba;">6bd6b080-7ec0-4802-b6ed-84051e332f59</span></div>
-          <div><span style="color:#8d8d8d;">environmentId &nbsp;&nbsp;</span><span style="color:#8a3ffc;">fd30e2a6-d90b-4be0-90f4-1bdceb07092d</span></div>
-          <div><span style="color:#8d8d8d;">platform &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color:#24a148;">ibmcloud &middot; us-south</span></div>
-          <div><span style="color:#8d8d8d;">hostURL &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color:#4589ff;">us-south.watson-orchestrate.cloud.ibm.com</span></div>
-        </div>
         <div style="background:#0f62fe11;border:1px solid #4589ff44;border-radius:8px;padding:14px;font-size:13px;margin-bottom:16px;">
           <strong>How to use:</strong>
           <ol style="margin:8px 0 0 18px;padding:0;display:flex;flex-direction:column;gap:4px;">
@@ -92,8 +85,8 @@
           </ol>
         </div>
         <div style="display:flex;gap:10px;flex-wrap:wrap;">
-          <a href="https://us-south.watson-orchestrate.cloud.ibm.com" target="_blank" rel="noopener" class="btn btn-primary btn-sm">Open Orchestrate Console &#8599;</a>
-          <a href="{{ url_for('agent_page') }}" class="btn btn-secondary btn-sm">Also try: ReAct Agent</a>
+          <a href="{{ url_for('agent_page') }}" class="btn btn-primary btn-sm">&#9889; Also try: ReAct Agent</a>
+          <a href="https://us-south.watson-orchestrate.cloud.ibm.com" target="_blank" rel="noopener" class="btn btn-secondary btn-sm">Orchestrate Console &#8599;</a>
         </div>
       </div>
     </div>
